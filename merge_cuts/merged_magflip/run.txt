@@ -1,0 +1,52 @@
+CREATE SCHEMA IF NOT EXISTS MagFlip;
+
+	 Current Running time is 0.000916 seconds.  CLOCKS_PER_SEC = 1000000
+USE MagFlip;
+
+	 Current Running time is 0.001035 seconds.  CLOCKS_PER_SEC = 1000000
+DROP TABLE IF EXISTS kDimuon, kTrack, Beam, BeamDAQ, Spill;
+
+	 Current Running time is 0.001079 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE TABLE Beam LIKE cuts1314_merged_roadset62_R004_V005.Beam;
+
+	 Current Running time is 0.001132 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE TABLE BeamDAQ LIKE cuts1314_merged_roadset62_R004_V005.BeamDAQ;
+
+	 Current Running time is 0.001213 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE TABLE Spill LIKE cuts1314_merged_roadset62_R004_V005.Spill;
+
+	 Current Running time is 0.00132 seconds.  CLOCKS_PER_SEC = 1000000
+INSERT INTO Beam SELECT Beam.* FROM cuts1314_merged_roadset62_R004_V005.Beam
+
+	 Current Running time is 0.00144 seconds.  CLOCKS_PER_SEC = 1000000
+INSERT INTO BeamDAQ SELECT BeamDAQ.* FROM cuts1314_merged_roadset62_R004_V005.BeamDAQ
+
+	 Current Running time is 0.00153 seconds.  CLOCKS_PER_SEC = 1000000
+INSERT INTO Spill SELECT Spill.* FROM cuts1314_merged_roadset62_R004_V005.Spill
+
+	 Current Running time is 0.001617 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE TABLE kDimuon SELECT * FROM cuts1314_merged_roadset62_R004_V005.kDimuon
+
+	 Current Running time is 0.001745 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE TABLE kTrack SELECT * FROM cuts1314_merged_roadset62_R004_V005.kTrack
+
+	 Current Running time is 0.00188 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE INDEX spill_pos ON kDimuon (spillID, posTrackID);
+
+	 Current Running time is 0.002014 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE INDEX spill_track ON kTrack (spillID, trackID);
+
+	 Current Running time is 0.002105 seconds.  CLOCKS_PER_SEC = 1000000
+ALTER TABLE Spill ADD COLUMN liveProton INT;
+
+	 Current Running time is 0.002213 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE Spill, Beam, BeamDAQ SET Spill.liveProton = Beam.value * (BeamDAQ.QIEsum - BeamDAQ.inhibit_block_sum - BeamDAQ.trigger_sum_no_inhibit) / BeamDAQ.QIEsum WHERE Spill.spillID = Beam.spillID AND Spill.spillID = BeamDAQ.spillID AND Beam.name = 'S:G2SEM'
+
+	 Current Running time is 0.002353 seconds.  CLOCKS_PER_SEC = 1000000
+	 Current Running time is 0.002372 seconds.  CLOCKS_PER_SEC = 1000000
+DROP TABLE IF EXISTS Beam, BeamDAQ, kTrack;
+
+	 Current Running time is 0.002445 seconds.  CLOCKS_PER_SEC = 1000000
+OPTIMIZE TABLES kDimuon, Spill;
+
+	 Current Running time is 0.002532 seconds.  CLOCKS_PER_SEC = 1000000
