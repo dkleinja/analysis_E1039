@@ -2,7 +2,7 @@ void drawbeamangle(const int tgtdmp = 2)
 {
 
   char Fname[128];
-  sprintf(Fname, "./nDST/BeamAngle2_kdimuon.root",tgtdmp);
+  sprintf(Fname, "./nDST/BeamAngle_tgt%d.root",tgtdmp);
   TFile *inFile = new TFile(Fname);
 
   TTree *dmtree = (TTree*) inFile -> Get("kdimuon");
@@ -20,8 +20,8 @@ void drawbeamangle(const int tgtdmp = 2)
 
   TH1I *Hsp0 = new TH1I("Hsp0", "spillID",700, 300000, 370000);
   TH1I *Hsp1 = new TH1I("Hsp1", "spillID",700, 300000, 370000);
-  TH1I *Hrun0 = new TH1I("Hrun0", "runID",700, 300000, 370000);
-  TH1I *Hrun1 = new TH1I("Hrun1", "runID",700, 300000, 370000);
+  TH1I *Hrun0 = new TH1I("Hsp0", "runID",700, 300000, 370000);
+  TH1I *Hrun1 = new TH1I("Hsp1", "runID",700, 300000, 370000);
   Hsp1 -> SetLineColor(2);
 
   Hm2m -> SetXTitle("hm (mm)");
@@ -96,8 +96,7 @@ void drawbeamangle(const int tgtdmp = 2)
   cout << "The number of Entries is " << nentries << endl;
   for(int i = 0; i < nentries; i++){
     dmtree -> GetEntry(i);
-    //if(tgtdmp == 1 && dz > 25)continue;
-    if(runID > 10091 && runID < 10185)continue;
+
     Hm2m -> Fill(m2hm,m2vm);
     Hm3m -> Fill(m3hm,m3vm);
     Hm2s -> Fill(m2hs,m2vs);
@@ -156,8 +155,8 @@ void drawbeamangle(const int tgtdmp = 2)
   Hpt -> Draw("colz");
   mpx -> Draw();
   mpy -> Draw();
-  //Hsp1 -> Draw();
-  //Hsp0 -> Draw("same");
+  Hsp1 -> Draw();
+  Hsp0 -> Draw("same");
 
   TCanvas *c4 = new TCanvas("c4","c4",1200,400);
   c4 -> Divide(2,1);
@@ -180,7 +179,7 @@ void drawbeamangle(const int tgtdmp = 2)
   Hpt1 -> Draw("colz");
   mpx -> Draw();
   mpy -> Draw();
-  //Hsp0 -> Draw();
-  //Hsp1 -> Draw("same");
+  Hsp0 -> Draw();
+  Hsp1 -> Draw("same");
 
 }

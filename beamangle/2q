@@ -127,8 +127,7 @@ void drawdp(const int spot = 5)
   for(int i = 0; i < nentries; i++){
     dmtree -> GetEntry(i);
 
-    if(runID > 10091 && runID < 10185)continue;
-    if(runID > 12439 && runID < 12522)continue;
+    //if(runID > 10091 && runID < 10185)continue;
     //if((m3hm < -2.5 || m3hm > 1.2) || (m3vm < 1. || m3vm > 4.6))continue;
 
     //if(spot == 1 && (runID < 10091 || runID > 10185))continue;

@@ -6,9 +6,8 @@ void drawdp(const int spot = 5)
   char Hname[128];
   char Tname[128];
 
-  sprintf(Fname, "./nDST/BeamAngle2_kdimuon.root");
   sprintf(Fname, "./nDST/BeamAngle_kdimuon.root");
-  sprintf(Fname, "./nDST/MagFlip_kdimuon.root");
+  //sprintf(Fname, "./nDST/MagFlip_kdimuon.root");
   TFile *inFile = new TFile(Fname);
   TTree *dmtree = (TTree*) inFile -> Get("kdimuon");
 
@@ -16,7 +15,7 @@ void drawdp(const int spot = 5)
   Hm3m -> SetXTitle("hm (mm)");
   Hm3m -> SetYTitle("vm (mm)");
 
-  TH2F *Hpxpy = new TH2F("Hpxpy","M3 Vert Mean vs. Hori Mean", 40, -4, 4, 40,  -4, 4);
+  TH2F *Hpxpy = new TH2F("Hpxpy","M3 Vert Mean vs. Hori Mean", 40, -5, 5, 40,  -5, 5);
   Hpxpy -> SetXTitle("p_{x} (GeV)");
   Hpxpy -> SetYTitle("p_{y} (GeV)");
 
@@ -127,8 +126,7 @@ void drawdp(const int spot = 5)
   for(int i = 0; i < nentries; i++){
     dmtree -> GetEntry(i);
 
-    if(runID > 10091 && runID < 10185)continue;
-    if(runID > 12439 && runID < 12522)continue;
+    //if(runID > 10091 && runID < 10185)continue;
     //if((m3hm < -2.5 || m3hm > 1.2) || (m3vm < 1. || m3vm > 4.6))continue;
 
     //if(spot == 1 && (runID < 10091 || runID > 10185))continue;
