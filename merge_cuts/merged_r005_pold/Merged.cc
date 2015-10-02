@@ -39,14 +39,16 @@ int main(int argc, char **argv)
   char schemaOutput[100];
   char login[30], password[30], server[100];
 
-  sprintf(schemaOutput, "cuts1489v1_merged_roadset57_R005_V001");
+  int roadset = 70;
+
+  sprintf(schemaOutput, "cuts1489v1_merged_roadset%d_R005_V001", roadset);
   //sprintf(login, "seaguest");
   //sprintf(password, "qqbar2mu+mu-");
   //sprintf(server, "seaquel.physics.illinois.edu");
   sprintf(login, "root");
   sprintf(password, "");
   sprintf(server, "localhost");
-  sprintf(inputFile, "merged_roadset57_R004_V005");
+  sprintf(inputFile, "merged_roadset%d_R005_V001", roadset);
   vector<string> schemaVector;
 
   int port = 3306;  // 3306 for most servers, 3283 for seaquel
@@ -290,11 +292,36 @@ int main(int argc, char **argv)
                 "JOIN %s.Scaler AS s2 ON s2.spillID = Spill.spillID AND s2.scalerName = 'AcceptedMatrix1' AND s2.spillType = 'EOS' "
                 "JOIN %s.Scaler AS s3 ON s3.spillID = Spill.spillID AND s3.scalerName = 'AfterInhMatrix1' AND s3.spillType = 'EOS' "
                 "JOIN tempRunList ON tempRunList.runID = Spill.runID "
-                "WHERE Spill.dataQuality = 1 "
+                "WHERE Spill.dataQuality = 0 "
                 "AND targetPos BETWEEN 1 AND 7 "
                 "AND targetPos = Target.value "
                 "AND Spill.spillID != 0;",
                 inputFile, inputFile, inputFile, inputFile, inputFile, inputFile, inputFile, inputFile);
+/*
+  sprintf(stmt, "INSERT INTO tempSpillList SELECT Spill.spillID FROM %s.Spill "
+                "JOIN %s.Beam AS b1 ON b1.spillID = Spill.spillID AND b1.name = 'S:G2SEM' "
+                "JOIN %s.Beam AS b2 ON b2.spillID = Spill.spillID AND b2.name = 'F:NM3ION' "
+                "JOIN %s.BeamDAQ ON Spill.spillID = BeamDAQ.spillID "
+                "JOIN %s.Target ON Target.spillID = Spill.spillID AND Target.name = 'TARGPOS_CONTROL' "
+                "JOIN %s.Scaler AS s1 ON s1.spillID = Spill.spillID AND s1.scalerName = 'TSgo' AND s1.spillType = 'EOS' "
+                "JOIN %s.Scaler AS s2 ON s2.spillID = Spill.spillID AND s2.scalerName = 'AcceptedMatrix1' AND s2.spillType = 'EOS' "
+                "JOIN %s.Scaler AS s3 ON s3.spillID = Spill.spillID AND s3.scalerName = 'AfterInhMatrix1' AND s3.spillType = 'EOS' "
+                "JOIN tempRunList ON tempRunList.runID = Spill.runID "
+                "WHERE b1.value BETWEEN 2e12 AND 1e13 "
+                "AND b2.value BETWEEN 2e12 AND 1e13 "
+                "AND s1.value BETWEEN 1e3 AND 8e3 "
+                "AND s2.value BETWEEN 1e3 AND 8e3 "
+                "AND s3.value BETWEEN 1e3 AND 3e4 "
+                "AND s2.value/s3.value BETWEEN 0.2 AND 0.9 "
+                "AND targetPos BETWEEN 1 AND 7 "
+                "AND targetPos = Target.value "
+                "AND QIEsum BETWEEN 4e10 AND 1e12 "
+                "AND inhibit_block_sum BETWEEN 4e9 AND 1e11 "
+                "AND trigger_sum_no_inhibit BETWEEN 4e9 AND 1e11 "
+                "AND dutyfactor53MHz BETWEEN 15 AND 60 "
+                "AND Spill.spillID != 0;",
+                inputFile, inputFile, inputFile, inputFile, inputFile, inputFile, inputFile, inputFile);
+*/
   mysql_query(con, stmt);
   if (MysqlErrorCheck() == 1)
     return 1;
@@ -551,11 +578,11 @@ int main(int argc, char **argv)
     cout << row[0] << " dimuons after spill cuts" <<endl;
 
     sprintf(stmt, "DELETE FROM kTrack WHERE "
-                  "numHits < 14 OR "
+                  "numHits < 15 OR "
                   "z0 < -400 OR "
                   "z0 > 200 OR "
                   "RoadID = 0 OR "
-                  "(numHits != 18 OR pz1 < 18) OR"
+                  "(numHits != 18 OR pz1 < 18) OR "
                   "chisq/(numHits - 5) > 5;");
     mysql_query(con, stmt);
       if (MysqlErrorCheck() == 1)
@@ -621,14 +648,14 @@ int main(int argc, char **argv)
     res = mysql_store_result(con);
 
     sprintf(stmt, "UPDATE kTrack SET target = 1 "
-                  "chisq_dump - chisq_target > 10;");
+                  "WHERE chisq_dump - chisq_target > 10;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
 
     sprintf(stmt, "UPDATE kTrack SET dump = 1 "
-                  "chisq_target - chisq_dump > 10;");
+                  "WHERE chisq_target - chisq_dump > 10;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
@@ -645,7 +672,7 @@ int main(int argc, char **argv)
     TimeStamp(time_start);
 
     sprintf(stmt, "UPDATE kDimuon, kTrack AS t1, kTrack AS t2 SET kDimuon.dump = 1 "
-                  "WHERE kDimuon.dz > 0 AND kDimuon.dz < -150 "
+                  "WHERE kDimuon.dz > 0 AND kDimuon.dz < 150 "
                   "AND kDimuon.spillID = t1.spillID AND kDimuon.posTrackID = t1.trackID "
                   "AND kDimuon.spillID = t2.spillID AND kDimuon.negTrackID = t2.trackID "
                   "AND t1.dump = 1 AND t2.dump = 1;");

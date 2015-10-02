@@ -39,7 +39,7 @@ int main(int argc, char **argv)
   char schemaOutput[100];
   char login[30], password[30], server[100];
 
-  int roadset = 61;
+  int roadset = 59;
 
   sprintf(schemaOutput, "cuts1489v1_merged_roadset%d_R005_V001", roadset);
   //sprintf(login, "seaguest");
@@ -578,7 +578,7 @@ int main(int argc, char **argv)
     cout << row[0] << " dimuons after spill cuts" <<endl;
 
     sprintf(stmt, "DELETE FROM kTrack WHERE "
-                  "numHits < 14 OR "
+                  "numHits < 15 OR "
                   "z0 < -400 OR "
                   "z0 > 200 OR "
                   "RoadID = 0 OR "
@@ -672,7 +672,7 @@ int main(int argc, char **argv)
     TimeStamp(time_start);
 
     sprintf(stmt, "UPDATE kDimuon, kTrack AS t1, kTrack AS t2 SET kDimuon.dump = 1 "
-                  "WHERE kDimuon.dz > 0 AND kDimuon.dz < -150 "
+                  "WHERE kDimuon.dz > 0 AND kDimuon.dz < 150 "
                   "AND kDimuon.spillID = t1.spillID AND kDimuon.posTrackID = t1.trackID "
                   "AND kDimuon.spillID = t2.spillID AND kDimuon.negTrackID = t2.trackID "
                   "AND t1.dump = 1 AND t2.dump = 1;");

@@ -39,11 +39,13 @@ int main(int argc, char **argv)
   char schemaOutput[100];
   char login[30], password[30], server[100];
 
-  sprintf(schemaOutput, "BeamAngle");
+  int roadset = 61;
+
+  sprintf(schemaOutput, "Analysis_roadset%d_R005_V001", roadset);
   sprintf(login, "root");
   sprintf(password, "");
   sprintf(server, "localhost");
-  sprintf(inputFile, "newMerge");
+  sprintf(inputFile, "cuts1489v1_merged_roadset%d_R005_V001", roadset);
 
   vector<string> schemaVector;
 
@@ -149,7 +151,19 @@ int main(int argc, char **argv)
   if (MysqlErrorCheck() == 1)
     return 1;
   TimeStamp(time_start);
-  /*
+
+  sprintf(stmt, "CREATE INDEX spill_pos ON kDimuon (spillID, posTrackID);");
+  mysql_query(con, stmt);
+  if (MysqlErrorCheck() == 1)
+    return 1;
+  TimeStamp(time_start);
+
+  sprintf(stmt, "CREATE INDEX spill_track ON kTrack (spillID, trackID);");
+  mysql_query(con, stmt);
+  if (MysqlErrorCheck() == 1)
+    return 1;
+  TimeStamp(time_start);
+ 
     //need to add kTrack momentums here
     sprintf(stmt, "ALTER TABLE kDimuon ADD COLUMN posx1 DOUBLE, "
 	    "ADD COLUMN posy1 DOUBLE, "
@@ -224,14 +238,15 @@ int main(int argc, char **argv)
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
-  */
+  
     //add beam information to kDimuon
+/*
     sprintf(stmt, "ALTER TABLE kDimuon ADD COLUMN targetPos TINYINT UNSIGNED;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
-
+*/
     sprintf(stmt, "ALTER TABLE kDimuon ADD COLUMN m3hm DOUBLE, "
 	    "ADD COLUMN m3hs DOUBLE, "
 	    "ADD COLUMN m3vm DOUBLE, "
@@ -249,14 +264,14 @@ int main(int argc, char **argv)
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
-
+/*
     sprintf(stmt, "UPDATE kDimuon, Spill SET kDimuon.targetPos = Spill.targetPos "
 	    "WHERE kDimuon.spillID = Spill.spillID");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
-
+*/
     sprintf(stmt, "UPDATE kDimuon SET m3hm = 0, m3hs = 0, m3vm = 0, m3vs = 0");
     //sprintf(stmt, "UPDATE kDimuon SET m3hm = 0");
     mysql_query(con, stmt);
@@ -327,13 +342,13 @@ int main(int argc, char **argv)
     TimeStamp(time_start);
 
     //add live proton information to Spill
-  sprintf(stmt, "ALTER TABLE Spill ADD COLUMN liveProton INT;");
+  sprintf(stmt, "ALTER TABLE Spill ADD COLUMN liveProton2 INT;");
   mysql_query(con, stmt);
   if (MysqlErrorCheck() == 1)
     return 1;
     TimeStamp(time_start);
 
-    sprintf(stmt, "UPDATE Spill, Beam, BeamDAQ SET Spill.liveProton = Beam.value * (BeamDAQ.QIEsum - BeamDAQ.inhibit_block_sum - BeamDAQ.trigger_sum_no_inhibit) / BeamDAQ.QIEsum "
+    sprintf(stmt, "UPDATE Spill, Beam, BeamDAQ SET Spill.liveProton2 = Beam.value * (BeamDAQ.QIEsum - BeamDAQ.inhibit_block_sum - BeamDAQ.trigger_sum_no_inhibit) / BeamDAQ.QIEsum "
             "WHERE Spill.spillID = Beam.spillID AND Spill.spillID = BeamDAQ.spillID AND Beam.name = 'S:G2SEM'");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
