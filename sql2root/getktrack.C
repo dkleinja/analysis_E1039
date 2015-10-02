@@ -6,7 +6,7 @@ void getktrack(const char *schema, const int val)
   char seedstmt [64];
   char table[64];
   int range = 1000000;
-  int limit = val*range + range;
+  int limit = val*range;
 
   sprintf(table, "kTrack_%d", val);
 
@@ -71,12 +71,12 @@ void getktrack(const char *schema, const int val)
   ktrack -> Branch ("x0",        &x0,        "x0/F");
   ktrack -> Branch ("y0",        &y0,        "y0/F");
   ktrack -> Branch ("z0",        &z0,        "z0/F");
-  ktrack -> Branch ("x_target",  &x_target,  "x_target/F");
-  ktrack -> Branch ("y_target",  &y_target,  "y_target/F");
-  ktrack -> Branch ("z_target",  &z_target,  "z_target/F");
-  ktrack -> Branch ("x_dump",    &x_dump,    "x_dump/F");
-  ktrack -> Branch ("y_dump",    &y_dump,    "y_dump/F");
-  ktrack -> Branch ("z_dump",    &z_dump,    "z_dump/F");
+  //ktrack -> Branch ("x_target",  &x_target,  "x_target/F");
+  //ktrack -> Branch ("y_target",  &y_target,  "y_target/F");
+  //ktrack -> Branch ("z_target",  &z_target,  "z_target/F");
+  //ktrack -> Branch ("x_dump",    &x_dump,    "x_dump/F");
+  //ktrack -> Branch ("y_dump",    &y_dump,    "y_dump/F");
+  //ktrack -> Branch ("z_dump",    &z_dump,    "z_dump/F");
   ktrack -> Branch ("x1",        &x1,        "x1/F");
   ktrack -> Branch ("y1",        &y1,        "y1/F");
   ktrack -> Branch ("z1",        &z1,        "z1/F");
@@ -94,6 +94,7 @@ void getktrack(const char *schema, const int val)
   ktrack -> Branch ("targetPos", &targetPos, "targetPos/I");
   ktrack -> Branch ("target",    &target,    "target/I");
   ktrack -> Branch ("dump",      &dump,      "dump/I");
+  ktrack -> Branch ("chisq",     &chisq,     "chisq/F");
 
   treeql -> SetBranchAddress ("runID",     &runID);
   treeql -> SetBranchAddress ("spillID",   &spillID);
@@ -104,12 +105,12 @@ void getktrack(const char *schema, const int val)
   treeql -> SetBranchAddress ("x0",        &x0);
   treeql -> SetBranchAddress ("y0",        &y0);
   treeql -> SetBranchAddress ("z0",        &z0);
-  treeql -> SetBranchAddress ("x_target",  &x_target);
-  treeql -> SetBranchAddress ("y_target",  &y_target);
-  treeql -> SetBranchAddress ("z_target",  &z_target);
-  treeql -> SetBranchAddress ("x_dump",    &x_dump);
-  treeql -> SetBranchAddress ("y_dump",    &y_dump);
-  treeql -> SetBranchAddress ("z_dump",    &z_dump);
+  //treeql -> SetBranchAddress ("x_target",  &x_target);
+  //treeql -> SetBranchAddress ("y_target",  &y_target);
+  //treeql -> SetBranchAddress ("z_target",  &z_target);
+  //treeql -> SetBranchAddress ("x_dump",    &x_dump);
+  //treeql -> SetBranchAddress ("y_dump",    &y_dump);
+  //treeql -> SetBranchAddress ("z_dump",    &z_dump);
   treeql -> SetBranchAddress ("x1",        &x1);
   treeql -> SetBranchAddress ("y1",        &y1);
   treeql -> SetBranchAddress ("z1",        &z1);
