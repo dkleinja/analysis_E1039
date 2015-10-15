@@ -1,0 +1,113 @@
+CREATE SCHEMA IF NOT EXISTS Analysis_roadset61_R005_V001;
+
+	 Current Running time is 0.001342 seconds.  CLOCKS_PER_SEC = 1000000
+USE Analysis_roadset61_R005_V001;
+
+	 Current Running time is 0.001481 seconds.  CLOCKS_PER_SEC = 1000000
+DROP TABLE IF EXISTS kDimuon, kTrack, Beam, BeamDAQ, Spill;
+
+	 Current Running time is 0.001544 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE TABLE Beam LIKE cuts1489v1_merged_roadset61_R005_V001.Beam;
+
+	 Current Running time is 0.001608 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE TABLE BeamDAQ LIKE cuts1489v1_merged_roadset61_R005_V001.BeamDAQ;
+
+	 Current Running time is 0.00167 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE TABLE Spill LIKE cuts1489v1_merged_roadset61_R005_V001.Spill;
+
+	 Current Running time is 0.001731 seconds.  CLOCKS_PER_SEC = 1000000
+INSERT INTO Beam SELECT Beam.* FROM cuts1489v1_merged_roadset61_R005_V001.Beam
+
+	 Current Running time is 0.001824 seconds.  CLOCKS_PER_SEC = 1000000
+INSERT INTO BeamDAQ SELECT BeamDAQ.* FROM cuts1489v1_merged_roadset61_R005_V001.BeamDAQ
+
+	 Current Running time is 0.001903 seconds.  CLOCKS_PER_SEC = 1000000
+INSERT INTO Spill SELECT Spill.* FROM cuts1489v1_merged_roadset61_R005_V001.Spill
+
+	 Current Running time is 0.001966 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE TABLE kDimuon SELECT * FROM cuts1489v1_merged_roadset61_R005_V001.kDimuon
+
+	 Current Running time is 0.00212 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE TABLE kTrack SELECT * FROM cuts1489v1_merged_roadset61_R005_V001.kTrack
+
+	 Current Running time is 0.002303 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE INDEX spill_pos ON kDimuon (spillID, posTrackID);
+
+	 Current Running time is 0.002492 seconds.  CLOCKS_PER_SEC = 1000000
+CREATE INDEX spill_track ON kTrack (spillID, trackID);
+
+	 Current Running time is 0.002661 seconds.  CLOCKS_PER_SEC = 1000000
+ALTER TABLE kDimuon ADD COLUMN posx1 DOUBLE, ADD COLUMN posy1 DOUBLE, ADD COLUMN posx3 DOUBLE, ADD COLUMN posy3 DOUBLE, ADD COLUMN negx1 DOUBLE, ADD COLUMN negy1 DOUBLE, ADD COLUMN negx3 DOUBLE, ADD COLUMN negy3 DOUBLE
+
+	 Current Running time is 0.002862 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE kDimuon SET posx1 = 0, posy1 = 0, posx3 = 0, posy3 = 0, negx1 = 0, negy1 = 0, negx3 = 0, negy3 = 0;
+
+	 Current Running time is 0.003017 seconds.  CLOCKS_PER_SEC = 1000000
+OPTIMIZE TABLES kTrack, kDimuon;
+
+	 Current Running time is 0.003266 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE kDimuon, kTrack SET kDimuon.posx1=kTrack.x1 WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.posTrackID = kTrack.TrackID
+
+UPDATE kDimuon, kTrack SET kDimuon.posy1=kTrack.y1 WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.posTrackID = kTrack.TrackID
+
+UPDATE kDimuon, kTrack SET kDimuon.posx3=kTrack.x3 WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.posTrackID = kTrack.TrackID
+
+UPDATE kDimuon, kTrack SET kDimuon.posy3=kTrack.y3 WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.posTrackID = kTrack.TrackID
+
+UPDATE kDimuon, kTrack SET kDimuon.negx1=kTrack.x1 WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.negTrackID = kTrack.TrackID
+
+UPDATE kDimuon, kTrack SET kDimuon.negy1=kTrack.y1 WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.negTrackID = kTrack.TrackID
+
+UPDATE kDimuon, kTrack SET kDimuon.negx3=kTrack.x3 WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.negTrackID = kTrack.TrackID
+
+UPDATE kDimuon, kTrack SET kDimuon.negy3=kTrack.y3 WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.negTrackID = kTrack.TrackID
+
+ALTER TABLE kDimuon ADD COLUMN m3hm DOUBLE, ADD COLUMN m3hs DOUBLE, ADD COLUMN m3vm DOUBLE, ADD COLUMN m3vs DOUBLE
+
+	 Current Running time is 0.004641 seconds.  CLOCKS_PER_SEC = 1000000
+ALTER TABLE kDimuon ADD COLUMN m2hm DOUBLE, ADD COLUMN m2hs DOUBLE, ADD COLUMN m2vm DOUBLE, ADD COLUMN m2vs DOUBLE
+
+	 Current Running time is 0.004834 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE kDimuon SET m3hm = 0, m3hs = 0, m3vm = 0, m3vs = 0
+
+	 Current Running time is 0.004988 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE kDimuon SET m2hm = 0, m2hs = 0, m2vm = 0, m2vs = 0
+
+	 Current Running time is 0.005137 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE kDimuon, Beam SET kDimuon.m3hm = Beam.value WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M3TGHM'
+
+	 Current Running time is 0.005334 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE kDimuon, Beam SET kDimuon.m3hs = Beam.value WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M3TGHS'
+
+	 Current Running time is 0.005512 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE kDimuon, Beam SET kDimuon.m3vm = Beam.value WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M3TGVM'
+
+	 Current Running time is 0.005675 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE kDimuon, Beam SET kDimuon.m3vs = Beam.value WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M3TGVS'
+
+	 Current Running time is 0.005837 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE kDimuon, Beam SET kDimuon.m2hm = Beam.value WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M2C2HM'
+
+	 Current Running time is 0.005996 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE kDimuon, Beam SET kDimuon.m2hs = Beam.value WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M2C2HS'
+
+	 Current Running time is 0.006148 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE kDimuon, Beam SET kDimuon.m2vm = Beam.value WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M2C2VM'
+
+	 Current Running time is 0.006307 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE kDimuon, Beam SET kDimuon.m2vs = Beam.value WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M2C2VS'
+
+	 Current Running time is 0.006466 seconds.  CLOCKS_PER_SEC = 1000000
+ALTER TABLE Spill ADD COLUMN liveProton2 BIGINT;
+
+	 Current Running time is 0.006585 seconds.  CLOCKS_PER_SEC = 1000000
+UPDATE Spill, Beam, BeamDAQ SET Spill.liveProton2 = Beam.value * (BeamDAQ.QIEsum - BeamDAQ.inhibit_block_sum - BeamDAQ.trigger_sum_no_inhibit) / BeamDAQ.QIEsum WHERE Spill.spillID = Beam.spillID AND Spill.spillID = BeamDAQ.spillID AND Beam.name = 'S:G2SEM'
+
+	 Current Running time is 0.006667 seconds.  CLOCKS_PER_SEC = 1000000
+	 Current Running time is 0.006676 seconds.  CLOCKS_PER_SEC = 1000000
+DROP TABLE IF EXISTS Beam, BeamDAQ, kTrack;
+
+	 Current Running time is 0.006788 seconds.  CLOCKS_PER_SEC = 1000000
+OPTIMIZE TABLES kDimuon, Spill;
+
+	 Current Running time is 0.006946 seconds.  CLOCKS_PER_SEC = 1000000

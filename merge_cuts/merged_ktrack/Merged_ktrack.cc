@@ -39,12 +39,14 @@ int main(int argc, char **argv)
   char schemaOutput[100];
   char login[30], password[30], server[100];
 
-  sprintf(schemaOutput, "MagFlip");
+  int roadset = 62;
+
+  sprintf(schemaOutput, "BeamAngle_roadset%d", roadset);
   sprintf(login, "root");
   sprintf(password, "");
   sprintf(server, "localhost");
   //sprintf(inputFile, "newMerge");
-  sprintf(inputFile, "cuts1314_merged_roadset62_R004_V005");
+  sprintf(inputFile, "cuts1489v1_merged_roadset%d_R005_V001", roadset);
 
   vector<string> schemaVector;
 

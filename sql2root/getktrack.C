@@ -68,6 +68,7 @@ void getktrack(const char *schema, const int val)
   ktrack -> Branch ("charge",    &charge,    "charge/I");
   ktrack -> Branch ("roadID",    &roadID,    "roadID/I");
   ktrack -> Branch ("chisq",     &chisq,     "chisq/F");
+  ktrack -> Branch ("numHits",   &numHits,   "numHits/I");
   ktrack -> Branch ("x0",        &x0,        "x0/F");
   ktrack -> Branch ("y0",        &y0,        "y0/F");
   ktrack -> Branch ("z0",        &z0,        "z0/F");
@@ -91,10 +92,9 @@ void getktrack(const char *schema, const int val)
   ktrack -> Branch ("pz3",       &pz3,       "pz3/F");
   ktrack -> Branch ("tx_PT",     &tx_PT,     "tx_PT/F");
   ktrack -> Branch ("ty_PT",     &ty_PT,     "ty_PT/F");
-  ktrack -> Branch ("targetPos", &targetPos, "targetPos/I");
+  //ktrack -> Branch ("targetPos", &targetPos, "targetPos/I");
   ktrack -> Branch ("target",    &target,    "target/I");
   ktrack -> Branch ("dump",      &dump,      "dump/I");
-  ktrack -> Branch ("chisq",     &chisq,     "chisq/F");
 
   treeql -> SetBranchAddress ("runID",     &runID);
   treeql -> SetBranchAddress ("spillID",   &spillID);
@@ -102,6 +102,7 @@ void getktrack(const char *schema, const int val)
   treeql -> SetBranchAddress ("charge",    &charge);
   treeql -> SetBranchAddress ("roadID",    &roadID);
   treeql -> SetBranchAddress ("chisq",     &chisq);
+  treeql -> SetBranchAddress ("numHits",   &numHits);
   treeql -> SetBranchAddress ("x0",        &x0);
   treeql -> SetBranchAddress ("y0",        &y0);
   treeql -> SetBranchAddress ("z0",        &z0);

@@ -39,7 +39,7 @@ int main(int argc, char **argv)
   char schemaOutput[100];
   char login[30], password[30], server[100];
 
-  int roadset = 61;
+  int roadset = 70;
 
   sprintf(schemaOutput, "Analysis_roadset%d_R005_V001", roadset);
   sprintf(login, "root");
@@ -172,13 +172,15 @@ int main(int argc, char **argv)
 	    "ADD COLUMN negx1 DOUBLE, "
 	    "ADD COLUMN negy1 DOUBLE, "
 	    "ADD COLUMN negx3 DOUBLE, "
-	    "ADD COLUMN negy3 DOUBLE");
+	    "ADD COLUMN negy3 DOUBLE, "
+	    "ADD COLUMN negHits INT, "
+	    "ADD COLUMN posHits INT");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);   
 
-    sprintf(stmt, "UPDATE kDimuon SET posx1 = 0, posy1 = 0, posx3 = 0, posy3 = 0, negx1 = 0, negy1 = 0, negx3 = 0, negy3 = 0;");
+    sprintf(stmt, "UPDATE kDimuon SET posx1 = 0, posy1 = 0, posx3 = 0, posy3 = 0, negx1 = 0, negy1 = 0, negx3 = 0, negy3 = 0, negHits = 0, posHits = 0;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
@@ -238,7 +240,20 @@ int main(int argc, char **argv)
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
-  
+
+    sprintf(stmt, "UPDATE kDimuon, kTrack SET kDimuon.negHits=kTrack.numHits "
+            "WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.negTrackID = kTrack.TrackID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+
+    sprintf(stmt, "UPDATE kDimuon, kTrack SET kDimuon.posHits=kTrack.numHits "
+            "WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.posTrackID = kTrack.TrackID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+
+ 
     //add beam information to kDimuon
 /*
     sprintf(stmt, "ALTER TABLE kDimuon ADD COLUMN targetPos TINYINT UNSIGNED;");
@@ -255,7 +270,7 @@ int main(int argc, char **argv)
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
-
+/*
     sprintf(stmt, "ALTER TABLE kDimuon ADD COLUMN m2hm DOUBLE, "
 	    "ADD COLUMN m2hs DOUBLE, "
 	    "ADD COLUMN m2vm DOUBLE, "
@@ -264,7 +279,7 @@ int main(int argc, char **argv)
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
-/*
+
     sprintf(stmt, "UPDATE kDimuon, Spill SET kDimuon.targetPos = Spill.targetPos "
 	    "WHERE kDimuon.spillID = Spill.spillID");
     mysql_query(con, stmt);
@@ -278,13 +293,13 @@ int main(int argc, char **argv)
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
-    
+ /*   
     sprintf(stmt, "UPDATE kDimuon SET m2hm = 0, m2hs = 0, m2vm = 0, m2vs = 0");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
-
+*/
     sprintf(stmt, "UPDATE kDimuon, Beam SET kDimuon.m3hm = Beam.value "
 	    "WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M3TGHM'");
     mysql_query(con, stmt);
@@ -312,7 +327,7 @@ int main(int argc, char **argv)
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
-
+/*
     sprintf(stmt, "UPDATE kDimuon, Beam SET kDimuon.m2hm = Beam.value "
 	    "WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M2C2HM'");
     mysql_query(con, stmt);
@@ -340,9 +355,9 @@ int main(int argc, char **argv)
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
-
+*/
     //add live proton information to Spill
-  sprintf(stmt, "ALTER TABLE Spill ADD COLUMN liveProton2 INT;");
+  sprintf(stmt, "ALTER TABLE Spill ADD COLUMN liveProton2 BIGINT;");
   mysql_query(con, stmt);
   if (MysqlErrorCheck() == 1)
     return 1;

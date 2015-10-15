@@ -16,6 +16,7 @@ void getkdimuon(const char *schema, const int tgtdmp = 4)
   Int_t runID;
   Int_t spillID, eventID;
   Int_t negTrackID, posTrackID;
+  Int_t negHits, posHits;
   Float_t xF, xT, xB, mass;
   Float_t dx, dy, dz;
   Float_t dpx, dpy, dpz;
@@ -76,6 +77,8 @@ void getkdimuon(const char *schema, const int tgtdmp = 4)
   kdimuon -> Branch ("targetPos",       &targetPos,       "targetPos/I");
   kdimuon -> Branch ("posTrackID",    &posTrackID,       "posTrackID/I");
   kdimuon -> Branch ("negTrackID",    &negTrackID,       "negTrackID/I");
+  kdimuon -> Branch ("posHits",       &posHits,          "posHits/I");
+  kdimuon -> Branch ("negHits",       &negHits,          "negHits/I");
   kdimuon -> Branch ("dx",              &dx,              "dx/F");
   kdimuon -> Branch ("dy",              &dy,              "dy/F");
   kdimuon -> Branch ("dz",              &dz,              "dz/F");
@@ -96,30 +99,32 @@ void getkdimuon(const char *schema, const int tgtdmp = 4)
   kdimuon -> Branch ("pz2",           &pz2,             "pz2/F");
   kdimuon -> Branch ("target",          &target,          "target/I");
   kdimuon -> Branch ("dump",            &dump,            "dump/I");
-  kdimuon -> Branch ("posx1",           &posx1);
-  kdimuon -> Branch ("posy1",           &posy1);
-  kdimuon -> Branch ("posx3",           &posx3);
-  kdimuon -> Branch ("posy3",           &posy3);
-  kdimuon -> Branch ("negx1",           &negx1);
-  kdimuon -> Branch ("negy1",           &negy1);
-  kdimuon -> Branch ("negx3",           &negx3);
-  kdimuon -> Branch ("negy3",           &negy3);
+  kdimuon -> Branch ("posx1",           &posx1,           "posx1/F");
+  kdimuon -> Branch ("posy1",           &posy1,           "posy1/F");
+  kdimuon -> Branch ("posx3",           &posx3,           "posx3/F");
+  kdimuon -> Branch ("posy3",           &posy3,           "posy3/F");
+  kdimuon -> Branch ("negx1",           &negx1,           "negx1/F");
+  kdimuon -> Branch ("negy1",           &negy1,           "negy1/F");
+  kdimuon -> Branch ("negx3",           &negx3,           "negx3/F");
+  kdimuon -> Branch ("negy3",           &negy3,           "negy3/F");
   kdimuon -> Branch ("m3hm",            &m3hm,            "m3hm/F");
   kdimuon -> Branch ("m3hs",            &m3hs,            "m3hs/F");
   kdimuon -> Branch ("m3vm",            &m3vm,            "m3vm/F");
   kdimuon -> Branch ("m3vs",            &m3vs,            "m3vs/F");
-  kdimuon -> Branch ("m2hm",            &m2hm,            "m2hm/F");
-  kdimuon -> Branch ("m2hs",            &m2hs,            "m2hs/F");
-  kdimuon -> Branch ("m2vm",            &m2vm,            "m2vm/F");
-  kdimuon -> Branch ("m2vs",            &m2vs,            "m2vs/F");
+  //kdimuon -> Branch ("m2hm",            &m2hm,            "m2hm/F");
+  //kdimuon -> Branch ("m2hs",            &m2hs,            "m2hs/F");
+  //kdimuon -> Branch ("m2vm",            &m2vm,            "m2vm/F");
+  //kdimuon -> Branch ("m2vs",            &m2vs,            "m2vs/F");
 
   treeql -> SetBranchAddress ("dimuonID",        &dimuonID);
   treeql -> SetBranchAddress ("runID",           &runID);
   treeql -> SetBranchAddress ("eventID",         &eventID);
   treeql -> SetBranchAddress ("spillID",         &spillID);
   treeql -> SetBranchAddress ("targetPos",       &targetPos);
-  treeql -> SetBranchAddress ("posTrackID",    &posTrackID);
-  treeql -> SetBranchAddress ("negTrackID",    &negTrackID);
+  treeql -> SetBranchAddress ("posTrackID",      &posTrackID);
+  treeql -> SetBranchAddress ("negTrackID",      &negTrackID);
+  treeql -> SetBranchAddress ("negHits",         &negHits);
+  treeql -> SetBranchAddress ("posHits",         &posHits);
   treeql -> SetBranchAddress ("dx",              &dx);
   treeql -> SetBranchAddress ("dy",              &dy);
   treeql -> SetBranchAddress ("dz",              &dz);
@@ -152,10 +157,10 @@ void getkdimuon(const char *schema, const int tgtdmp = 4)
   treeql -> SetBranchAddress ("m3hs",            &m3hs);
   treeql -> SetBranchAddress ("m3vm",            &m3vm);
   treeql -> SetBranchAddress ("m3vs",            &m3vs);
-  treeql -> SetBranchAddress ("m2hm",            &m2hm);
-  treeql -> SetBranchAddress ("m2hs",            &m2hs);
-  treeql -> SetBranchAddress ("m2vm",            &m2vm);
-  treeql -> SetBranchAddress ("m2vs",            &m2vs);
+  //treeql -> SetBranchAddress ("m2hm",            &m2hm);
+  //treeql -> SetBranchAddress ("m2hs",            &m2hs);
+  //treeql -> SetBranchAddress ("m2vm",            &m2vm);
+  //treeql -> SetBranchAddress ("m2vs",            &m2vs);
 
   int nentries = treeql -> GetEntries();
   cout << "The number of Entries is " << nentries << endl;
@@ -164,7 +169,7 @@ void getkdimuon(const char *schema, const int tgtdmp = 4)
     treeql -> GetEntry(i);
 
     //if(target == 0 && dump ==0) cout << runID << " " << spillID << " " << eventID << " " << target << " " << dump << " " << targetPos << endl;
-    //if(mass < 4.2)continue;
+    if(mass < 4.2)continue;
     kdimuon -> Fill();
 
     //if(eventID%1 == 0) cout << "EventID " << eventID << endl;
