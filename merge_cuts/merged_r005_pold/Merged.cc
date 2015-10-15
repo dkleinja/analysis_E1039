@@ -582,7 +582,7 @@ int main(int argc, char **argv)
                   "z0 < -400 OR "
                   "z0 > 200 OR "
                   "RoadID = 0 OR "
-                  "(numHits != 18 OR pz1 < 18) OR "
+                  "(numHits != 18 AND pz1 < 18) OR "
                   "chisq/(numHits - 5) > 5;");
     mysql_query(con, stmt);
       if (MysqlErrorCheck() == 1)
@@ -691,7 +691,7 @@ int main(int argc, char **argv)
                   "xT NOT BETWEEN 0 AND 1 OR "
                   "chisq_dimuon > 15 OR "
                   "mass NOT BETWEEN 0 AND 10 OR "
-                  "(px1 > 0 AND px2 < 0) OR "
+                  "(px1 < 0 AND px2 > 0) OR "
                   "ABS(trackSeparation) > 250;");
     mysql_query(con, stmt);
       if (MysqlErrorCheck() == 1)
