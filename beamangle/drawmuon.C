@@ -1,4 +1,4 @@
-void drawmuon(const int particle = 3, const int spot = 5)
+void drawmuon(const int roadset= 62, const int spot = 5)
 {
   gStyle -> SetOptFit(1);
 
@@ -8,6 +8,8 @@ void drawmuon(const int particle = 3, const int spot = 5)
 
   sprintf(Fname, "./nDST/BeamAngle_kdimuon.root");
   sprintf(Fname, "./nDST/MagFlip_kdimuon.root");
+  sprintf(Fname, "./nDST/Analysis_roadset%d_R005_V001.root", roadset);
+
   TFile *inFile = new TFile(Fname);
   TTree *dmtree = (TTree*) inFile -> Get("kdimuon");
 
@@ -494,7 +496,7 @@ void drawmuon(const int particle = 3, const int spot = 5)
   cz8 -> SaveAs("./images/dpz_dump.gif");
  
   */
-  Gpxpz1 -> Print();
-  Gpxpz2 -> Print();
+  Gpy1 -> Print();
+  Gpy2 -> Print();
   
 }

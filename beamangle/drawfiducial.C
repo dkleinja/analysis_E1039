@@ -1,4 +1,4 @@
-void drawfiducial()
+void drawfiducial(const int roadset = 62)
 {
   gStyle -> SetOptFit(1);
 
@@ -7,7 +7,8 @@ void drawfiducial()
   char Tname[128];
 
   sprintf(Fname, "./nDST/BeamAngle_kdimuon.root");
-  sprintf(Fname, "./nDST/MagFlip2_kdimuon.root");
+  sprintf(Fname, "./nDST/MagFlip_kdimuon.root");
+  sprintf(Fname, "./nDST/Analysis_roadset%d_R005_V001.root", roadset);
   TFile *inFile = new TFile(Fname);
   TTree *dmtree = (TTree*) inFile -> Get("kdimuon");
 
@@ -169,7 +170,9 @@ void drawfiducial()
     if(i%100000 == 0) cout << i << endl;
     dmtree -> GetEntry(i);
 
-    if(runID > 10091 && runID < 10185)continue;
+
+    if(mass < 4.2)continue;
+    //if(runID > 10091 && runID < 10185)continue;
     //if((m3hm < -2.5 || m3hm > 1.2) || (m3vm < 1. || m3vm > 4.6))continue;
 
     //make fiducial cuts
