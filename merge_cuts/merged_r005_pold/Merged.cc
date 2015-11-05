@@ -293,6 +293,7 @@ int main(int argc, char **argv)
                 "JOIN %s.Scaler AS s3 ON s3.spillID = Spill.spillID AND s3.scalerName = 'AfterInhMatrix1' AND s3.spillType = 'EOS' "
                 "JOIN tempRunList ON tempRunList.runID = Spill.runID "
                 "WHERE Spill.dataQuality = 0 "
+                "AND Spill.status = 0 "
                 "AND targetPos BETWEEN 1 AND 7 "
                 "AND targetPos = Target.value "
                 "AND Spill.spillID != 0;",
@@ -592,7 +593,8 @@ int main(int argc, char **argv)
     sprintf(stmt, "DELETE FROM kDimuon USING kDimuon "
                   "LEFT JOIN kTrack AS t1 ON t1.spillID = kDimuon.spillID AND t1.trackID = kDimuon.posTrackID "
                   "LEFT JOIN kTrack AS t2 ON t2.spillID = kDimuon.spillID AND t2.trackID = kDimuon.negTrackID "
-                  "WHERE t1.trackID IS NULL OR "
+                  "WHERE (t1.roadID * t2.roadID < 0) OR "
+                  "t1.trackID IS NULL OR "
                   "t2.trackID IS NULL;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
