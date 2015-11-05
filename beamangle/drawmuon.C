@@ -1,4 +1,4 @@
-void drawmuon(const int roadset= 62, const int spot = 5)
+void drawmuon(const int roadset= 62, const int muplusddown = 0)
 {
   gStyle -> SetOptFit(1);
 
@@ -17,6 +17,15 @@ void drawmuon(const int roadset= 62, const int spot = 5)
   Hm3m -> SetXTitle("hm (mm)");
   Hm3m -> SetYTitle("vm (mm)");
 
+  TH2F *Hpxpy = new TH2F("Hpxpy","py vs px D-Y", 40, -5, 5, 40,  -5, 5);
+  Hpxpy -> SetXTitle("p_{x} [GeV]");
+  Hpxpy -> SetYTitle("p_{y} [GeV]");
+  
+  TH3F *Hpxpypz = new TH3F("Hpxpypz","pz vs py vs px D-Y", 40, -5, 5, 40,  -5, 5, 100, 20, 120);
+  Hpxpypz -> SetXTitle("p_{x} [GeV]");
+  Hpxpypz -> SetYTitle("p_{y} [GeV]");
+  Hpxpypz -> SetZTitle("p_{z} [GeV]");
+  
   TH2F *Hpxpy1 = new TH2F("Hpxpy1","py vs px #mu^{+}", 40, -5, 5, 40,  -5, 5);
   Hpxpy1 -> SetXTitle("p_{x} [GeV]");
   Hpxpy1 -> SetYTitle("p_{y} [GeV]");
@@ -25,19 +34,19 @@ void drawmuon(const int roadset= 62, const int spot = 5)
   Hpxpy2 -> SetXTitle("p_{x} [GeV]");
   Hpxpy2 -> SetYTitle("p_{y} [GeV]");
  
-  TH2F *Hpxpz1 = new TH2F("Hpxpz1","dimuon dpz vs #mu^{+} px", 40, -5, 5, 100,  20, 120);
+  TH2F *Hpxpz1 = new TH2F("Hpxpz1","pz vs px #mu^{+}", 40, -5, 5, 100,  20, 120);
   Hpxpz1 -> SetXTitle("p_{x} [GeV]");
   Hpxpz1 -> SetYTitle("p_{z} [GeV]");
 
-  TH2F *Hpxpz2 = new TH2F("Hpxpz2","dimuon dpz vs #mu^{-} px", 40, -5, 5, 100, 20, 120);
+  TH2F *Hpxpz2 = new TH2F("Hpxpz2","pz vs px #mu^{-}", 40, -5, 5, 100, 20, 120);
   Hpxpz2 -> SetXTitle("p_{x} [GeV]");
   Hpxpz2 -> SetYTitle("p_{z} [GeV]");
 
-  TH2F *Hpypz1 = new TH2F("Hpypz1","dimuon dpz vs #mu^{+} py", 40, -5, 5, 100,  20, 120);
+  TH2F *Hpypz1 = new TH2F("Hpypz1","pz vs py #mu^{+}", 40, -5, 5, 100,  20, 120);
   Hpypz1 -> SetXTitle("p_{y} [GeV]");
   Hpypz1 -> SetYTitle("p_{z} [GeV]");
 
-  TH2F *Hpypz2 = new TH2F("Hpypz2","dimuon dpz vs #mu^{-} py", 40, -5, 5, 100, 20, 120);
+  TH2F *Hpypz2 = new TH2F("Hpypz2","pz vs py #mu^{-}", 40, -5, 5, 100, 20, 120);
   Hpypz2 -> SetXTitle("p_{y} [GeV]");
   Hpypz2 -> SetYTitle("p_{z} [GeV]");
 
@@ -173,11 +182,16 @@ void drawmuon(const int roadset= 62, const int spot = 5)
   dmtree -> SetBranchAddress ("m3hs",            &m3hs);
   dmtree -> SetBranchAddress ("m3vm",            &m3vm);
   dmtree -> SetBranchAddress ("m3vs",            &m3vs);
-  dmtree -> SetBranchAddress ("m2hm",            &m2hm);
-  dmtree -> SetBranchAddress ("m2hs",            &m2hs);
-  dmtree -> SetBranchAddress ("m2vm",            &m2vm);
-  dmtree -> SetBranchAddress ("m2vs",            &m2vs);
+  dmtree -> SetBranchAddress ("posx1",           &posx1);
+  dmtree -> SetBranchAddress ("posy1",           &posy1);
+  dmtree -> SetBranchAddress ("posx3",           &posx3);
+  dmtree -> SetBranchAddress ("posy3",           &posy3);
+  dmtree -> SetBranchAddress ("negx1",           &negx1);
+  dmtree -> SetBranchAddress ("negy1",           &negy1);
+  dmtree -> SetBranchAddress ("negx3",           &negx3);
+  dmtree -> SetBranchAddress ("negy3",           &negy3);
 
+  
   int nentries = dmtree -> GetEntries();
   cout << "The number of Entries is " << nentries << endl;
   int zbin;
@@ -188,14 +202,18 @@ void drawmuon(const int roadset= 62, const int spot = 5)
     //if((m3hm < -2.5 || m3hm > 1.2) || (m3vm < 1. || m3vm > 4.6))continue;
 
     //if(spot == 1 && (runID < 10091 || runID > 10185))continue;
-
+    /*
     if(spot == 0 && m3vm < 3.10) continue;
     if(spot == 1 && m3vm > 3.10) continue;
     if(spot == 2 && m3hm > -0.71) continue;
     if(spot == 3 && m3hm < -0.71) continue;
     if(spot == 4 && (m3hm < -0.71 || m3vm > 3.10)) continue;
+    */
     Hm3m -> Fill(m3hm,m3vm);
-  
+
+    Hpxpy -> Fill(dpx, dpy);
+    Hpxpypz -> Fill(dpx, dpy, dpz);
+    
     if(target == 1){
       Hpx01 -> Fill(px1);
       Hpy01 -> Fill(py1);
@@ -204,11 +222,11 @@ void drawmuon(const int roadset= 62, const int spot = 5)
       Hpy02 -> Fill(py2);
       Hpz02 -> Fill(pz2);
       Hpxpy1 -> Fill(px1, py1);
-      Hpxpz1 -> Fill(px1, dpz);
-      Hpypz1 -> Fill(py1, dpz);
+      Hpxpz1 -> Fill(px1, pz1);
+      Hpypz1 -> Fill(py1, pz1);
       Hpxpy2 -> Fill(px2, py2);
-      Hpxpz2 -> Fill(px2, dpz);
-      Hpypz2 -> Fill(py2, dpz);
+      Hpxpz2 -> Fill(px2, pz2);
+      Hpypz2 -> Fill(py2, pz2);
     }
   
     if(dump == 1 && dz > -50. && dz < 150.){
@@ -225,7 +243,7 @@ void drawmuon(const int roadset= 62, const int spot = 5)
       Hpxpy2 -> Fill(px2, py2);
       Hpxpz2 -> Fill(px2, dpz);
       Hpypz2 -> Fill(py2, dpz);
-
+      
     }
   }
 
@@ -234,11 +252,11 @@ void drawmuon(const int roadset= 62, const int spot = 5)
   TH1D *Hpypz1bins[20];
   TGraph *Gpxpz1 = new TGraph();
   Gpxpz1 -> SetMarkerStyle(21);
-  Gpxpz1 -> SetTitle("#mu^{+,-} p_{x} vs Dimuon p_{z}");
+  Gpxpz1 -> SetTitle("#mu^{+,-} p_{x} vs p_{z}");
   TGraph *Gpypz1 = new TGraph();
   Gpypz1 -> SetMarkerStyle(21);
   Gpypz1 -> SetMarkerColor(2);
-  Gpypz1 -> SetTitle("#mu^{+,-} p_{y} vs Dimuon p_{z}");
+  Gpypz1 -> SetTitle("#mu^{+,-} p_{y} vs p_{z}");
   Int_t blow, bhigh;
   Double_t gpxpz_x1[9] = {35, 45, 55, 65, 75, 85, 95, 105, 115};
   Double_t gpxpz_y1[9];
@@ -263,22 +281,21 @@ void drawmuon(const int roadset= 62, const int spot = 5)
     
   }
 
-  Gpxpz1 -> GetXaxis() -> SetTitle("dimuon pz [GeV]");
+  Gpxpz1 -> GetXaxis() -> SetTitle("#mu^{+,-} pz [GeV]");
   Gpxpz1 -> GetYaxis() -> SetTitle("#mu^{+,-} px [GeV]");
-  Gpypz1 -> GetXaxis() -> SetTitle("dimuon pz [GeV]");
+  Gpypz1 -> GetXaxis() -> SetTitle("#mu^{+,-} pz [GeV]");
   Gpypz1 -> GetYaxis() -> SetTitle("#mu^{+,-} py [GeV]");
-
 
   //get mean px,py for pz points mu-
   TH1D *Hpxpz2bins[20];
   TH1D *Hpypz2bins[20];
   TGraph *Gpxpz2 = new TGraph();
   Gpxpz2 -> SetMarkerStyle(25);
-  Gpxpz2 -> SetTitle("#mu^{+,-} p_{x} vs Dimuon p_{z}");
+  Gpxpz2 -> SetTitle("#mu^{+,-} p_{x} vs p_{z}");
   TGraph *Gpypz2 = new TGraph();
   Gpypz2 -> SetMarkerStyle(25);
   Gpypz2 -> SetMarkerColor(2);
-  Gpypz2 -> SetTitle("#mu^{+,-} p_{x} vs Dimuon p_{z}");
+  Gpypz2 -> SetTitle("#mu^{+,-} p_{x} vs p_{z}");
   Double_t gpxpz_x2[9] = {35, 45, 55, 65, 75, 85, 95, 105, 115};
   Double_t gpxpz_y2[9];
   Double_t gpypz_x2[9] = {35, 45, 55, 65, 75, 85, 95, 105, 115};
@@ -293,7 +310,8 @@ void drawmuon(const int roadset= 62, const int spot = 5)
     sprintf(Hname, "Hpypz2bins_dpz%d", b);
     Hpypz2bins[b] = new TH1D(Hname, Hname, 100, 20, 120);
     Hpypz2bins[b] = Hpypz2 -> ProjectionX("Hname", blow, bhigh);
-    gpypz_y2[b] = Hpypz1bins[b] -> GetMean();
+    //was a mistake heremistake here!
+    gpypz_y2[b] = Hpypz2bins[b] -> GetMean();
 
     //cout << b << " " << gpxpz_x1[b] << " " << gpxpz_y1[b] << endl;
     //cout << b << " " << gpxpz_x2[b] << " " << gpxpz_y2[b] << endl;
@@ -313,18 +331,18 @@ void drawmuon(const int roadset= 62, const int spot = 5)
   //exit(1);
 
   //get the average value of px, py and make graphs
-  Double_t gpx_x1[nbins+1] = {-130, -25., 25., 75., 125.};
+  Double_t gpx_x1[nbins+1] = {-130, -25, 25., 75., 125.};
   Double_t gpx_y1[nbins+1];
   TGraph *Gpx1 = new TGraph();
   Gpx1 -> SetMarkerStyle(21);
   Gpx1 -> SetFillColor(0);
-  Double_t gpy_x1[nbins+1] = {-130, -25., 25., 75., 125.};
+  Double_t gpy_x1[nbins+1] = {-130, -25, 25., 75., 125.};
   Double_t gpy_y1[nbins+1];
   TGraph *Gpy1 = new TGraph();
   Gpy1 -> SetMarkerStyle(21);
   Gpy1 -> SetMarkerColor(2);
   Gpy1 -> SetFillColor(0);
-  Double_t gpz_x1[nbins+1] = {-130, -25., 25., 75., 125.};
+  Double_t gpz_x1[nbins+1] = {-130, -25, 25., 75., 125.};
   Double_t gpz_y1[nbins+1];
   TGraph *Gpz1 = new TGraph();
   Gpz1 -> SetMarkerStyle(21);
@@ -353,22 +371,22 @@ void drawmuon(const int roadset= 62, const int spot = 5)
   Gpx1 -> SetTitle("#mu^{+,-} p_{x} vs Dimuon zvtx");
   Gpx1 -> GetXaxis() -> SetTitle("zvtx [cm]");
   Gpx1 -> GetYaxis() -> SetTitle("#mu^{+,-} p_{x} [GeV]");
-  Gpx1 -> SetTitle("#mu^{+,-} p_{y} vs Dimuon zvtx");
+  Gpy1 -> SetTitle("#mu^{+,-} p_{y} vs Dimuon zvtx");
   Gpy1 -> GetXaxis() -> SetTitle("zvtx [cm]");
   Gpy1 -> GetYaxis() -> SetTitle("#mu^{+,-} p_{y} [GeV]");
   
- Double_t gpx_x2[nbins+1] = {-130, -25., 25., 75., 125.};
+  Double_t gpx_x2[nbins+1] = {-130, -25, 25., 75., 125.};
   Double_t gpx_y2[nbins+1];
   TGraph *Gpx2 = new TGraph();
   Gpx2 -> SetMarkerStyle(25  );
   Gpx2 -> SetFillColor(0);
-  Double_t gpy_x2[nbins+1] = {-130, -25., 25., 75., 125.};
+  Double_t gpy_x2[nbins+1] = {-130, -25, 25., 75., 125.};
   Double_t gpy_y2[nbins+1];
   TGraph *Gpy2 = new TGraph();
   Gpy2 -> SetMarkerStyle(25);
   Gpy2 -> SetMarkerColor(2);
   Gpy2 -> SetFillColor(0);
-  Double_t gpz_x2[nbins+1] = {-130, -25., 25., 75., 125.};
+  Double_t gpz_x2[nbins+1] = {-130, -25, 25., 75., 125.};
   Double_t gpz_y2[nbins+1];
   TGraph *Gpz2 = new TGraph();
   Gpz2 -> SetMarkerStyle(25);
@@ -390,6 +408,7 @@ void drawmuon(const int roadset= 62, const int spot = 5)
     Gpy2 -> SetPoint(i, gpy_x2[i], gpy_y2[i]);
     Gpz2 -> SetPoint(i, gpz_x2[i], gpz_y2[i]);
   }
+  
   //Gpx2 -> SetTitle("Mean p_{x,y,z} of dimuons vs zvtx");
   //Gpx2 -> GetXaxis() -> SetTitle("dz [cm]");
   //Gpx2 -> GetYaxis() -> SetTitle("dp_{x,y,z} [GeV]");
@@ -411,42 +430,54 @@ void drawmuon(const int roadset= 62, const int spot = 5)
   TLine *ldz = new TLine(-150,0,150,0);
   ldpz -> SetLineStyle(2);
   ldz -> SetLineStyle(2);
-
-
-  TCanvas *c2 = new TCanvas("c2","c2",2000,800);
-  c2 -> Divide(4,2);
-  c2 -> cd(1);
+  
+  TCanvas *c4 = new TCanvas("c4","c4",1000,800);
+  c4 -> Divide(2, 2);
+  c4 -> cd(1);
+  Hm3m -> Draw("colz");
+  c4 -> cd(2);
+  Hpxpy -> Draw("colz");
+  m3h -> Draw(); m3v -> Draw();
+  c4 -> cd(3);
+  Hpxpy1 -> Draw("colz");
+  c4 -> cd(4;
+  Hpxpy2 -> Draw("colz");
+ 
+  
+  TCanvas *c8 = new TCanvas("c8","c8",2000,800);
+  c8 -> Divide(4,2);
+  c8 -> cd(1);
   Hpxpz1 -> Draw("colz");
   m3h -> Draw();
-  c2 -> cd(2);
+  c8 -> cd(2);
   Hpxpz2 -> Draw("colz");
   m3h -> Draw();
-  c2 -> cd(3);
+  c8 -> cd(3);
   Gpxpz1 -> Draw("ap");
   Gpxpz2 -> Draw("p");
   ldpz -> Draw();
-  c2 -> cd(4);
+  c8 -> cd(4);
   Gpx1 -> Draw("ap");
   Gpx2 -> Draw("p");
   legend1 -> Draw();
   ldz -> Draw();
-  c2 -> cd(5);
+  c8 -> cd(5);
   Hpypz1 -> Draw("colz");
   m3h -> Draw();
-  c2 -> cd(6);
+  c8 -> cd(6);
   Hpypz2 -> Draw("colz");
   m3h -> Draw(); 
-  c2 -> cd(7);
+  c8 -> cd(7);
   Gpypz1 -> Draw("ap");
   Gpypz2 -> Draw("p");
   ldpz -> Draw();
-  c2 -> cd(8);
+  c8 -> cd(8);
   Gpy1 -> Draw("ap");
   Gpy2 -> Draw("p");
   legend2 -> Draw();
   ldz -> Draw();
   sprintf(Hname,"./images/dp_all_spot%d.gif", spot);
-  c2 -> SaveAs(Hname);
+  c8 -> SaveAs(Hname);
   /*
   TCanvas *c3 = new TCanvas("c3","c3",1800,400);
   c3 -> Divide(3,1);
@@ -496,7 +527,27 @@ void drawmuon(const int roadset= 62, const int spot = 5)
   cz8 -> SaveAs("./images/dpz_dump.gif");
  
   */
-  Gpy1 -> Print();
-  Gpy2 -> Print();
+  //Gpy1 -> Print();
+  //Gpy2 -> Print();
+
+  TLorentzVector mu1;
+  TLorentzVector mu2;
+  TLorentzVector lordy;
+
+  Float_t energy1 = sqrt(pow(Hpxpy1 -> GetMean(1),2) + pow(Hpxpy1 -> GetMean(2), 2) + pow(Hpxpz1 -> GetMean(2), 2)) + pow(0.105, 2);
+  Float_t energy2 = sqrt(pow(Hpxpy2 -> GetMean(1),2) + pow(Hpxpy2 -> GetMean(2), 2) + pow(Hpxpz2 -> GetMean(2), 2)) + pow(0.105, 2);
+  cout << energy1 << " " << energy2 << endl;
+  //mu1.SetPxPyPzE(Hpxpy1 -> GetMean(1), Hpxpy1 -> GetMean(2), Hpxpz1 -> GetMean(2), energy1);
+  //mu2.SetPxPyPzE(Hpxpy2 -> GetMean(1), Hpxpy2 -> GetMean(2), Hpxpz2 -> GetMean(2), energy2);
+  mu1.SetXYZM(Hpxpy1 -> GetMean(1), Hpxpy1 -> GetMean(2), Hpxpz1 -> GetMean(2), 0.105);
+  mu2.SetXYZM(Hpxpy2 -> GetMean(1), Hpxpy2 -> GetMean(2), Hpxpz2 -> GetMean(2), 0.105);
+//lordy.SetPxPyPzE(0, 0, 0, 0);
+  lordy = mu1 + mu2;
+
+  cout << mu1.Px() << " " << mu2.Px() << " " << lordy.Px() << " " << Hpxpypz -> GetMean(1) << endl;
+  cout << mu1.Py() << " " << mu2.Py() << " " << lordy.Py() << " " << Hpxpypz -> GetMean(2) << endl;
+  cout << mu1.Pz() << " " << mu2.Pz() << " " << lordy.Pz() << " " << Hpxpypz -> GetMean(3) << endl;
+
+
   
 }
