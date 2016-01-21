@@ -1,4 +1,4 @@
-void drawdp(const int spot = 5)
+void drawdp(const int roadset = 57, const int spot = 5)
 {
   gStyle -> SetOptFit(1);
 
@@ -9,8 +9,8 @@ void drawdp(const int spot = 5)
   sprintf(Fname, "./nDST/BeamAngle2_kdimuon.root");
   sprintf(Fname, "./nDST/BeamAngle_kdimuon.root");
   sprintf(Fname, "./nDST/MagFlip_kdimuon.root");
-  sprintf(Fname, "./nDST/Analysis_roadset62_R005_V001.root");
-  sprintf(Fname, "./nDST/Analysis_roadset57_R005_V001.root");
+  sprintf(Fname, "./nDST/Analysis_roadset%d_R005_V001.root", roadset);
+  //sprintf(Fname, "./nDST/Analysis_roadset57_R005_V001.root");
   TFile *inFile = new TFile(Fname);
   TTree *dmtree = (TTree*) inFile -> Get("kdimuon");
 
