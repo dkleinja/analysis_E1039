@@ -1,4 +1,4 @@
-void getkdimuon(const char *schema, const int tgtdmp = 4)
+void getkdimuon(const char *schema)
 {
   //connect to server
   //TSQLServer *con = TSQLServer::Connect("mysql://seaquel.physics.illinois.edu:3283", "seaguest", "qqbar2mu+mu-");
@@ -18,6 +18,7 @@ void getkdimuon(const char *schema, const int tgtdmp = 4)
   Int_t negTrackID, posTrackID;
   Int_t negHits, posHits;
   Float_t xF, xT, xB, mass;
+  Float_t costh, phi;
   Float_t dx, dy, dz;
   Float_t dpx, dpy, dpz;
   Float_t px1, py1, pz1;
@@ -89,6 +90,8 @@ void getkdimuon(const char *schema, const int tgtdmp = 4)
   kdimuon -> Branch ("xF",              &xF,              "xF/F");  
   kdimuon -> Branch ("xB",              &xB,              "xB/F");
   kdimuon -> Branch ("xT",              &xT,              "xT/F");
+  kdimuon -> Branch ("costh",           &costh,           "costh/F");
+  kdimuon -> Branch ("phi",             &phi,             "phi/F");
   kdimuon -> Branch ("trackSeparation", &trackSeparation, "trackSeparation/F");
   kdimuon -> Branch ("chisq_dimuon",    &chisq_dimuon,    "chisq_dimuon/F");
   kdimuon -> Branch ("px1",           &px1,             "px1/F");
@@ -135,6 +138,8 @@ void getkdimuon(const char *schema, const int tgtdmp = 4)
   treeql -> SetBranchAddress ("xF",              &xF);
   treeql -> SetBranchAddress ("xB",              &xB);
   treeql -> SetBranchAddress ("xT",              &xT);
+  treeql -> SetBranchAddress ("costh",    	 &costh);
+  treeql -> SetBranchAddress ("phi",    	 &phi);
   treeql -> SetBranchAddress ("trackSeparation", &trackSeparation);
   treeql -> SetBranchAddress ("chisq_dimuon",    &chisq_dimuon);
   treeql -> SetBranchAddress ("px1",             &px1);
@@ -225,7 +230,7 @@ void getkdimuon(const char *schema, const int tgtdmp = 4)
   GxT -> GetYaxis() -> SetTitle("Rate [Hz]");
 
   char outname[128];
-  sprintf(outname, "./nDST/%s.root", schema, tgtdmp);
+  sprintf(outname, "./nDST/%s.root", schema);
   TFile *outfile = new TFile(outname,"RECREATE");
   outfile -> cd();
   kdimuon -> Write();
