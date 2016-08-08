@@ -19,7 +19,7 @@ using namespace std;
 #include <my_root_functions.C>
 #include <asym_funcs.C>
 
-void asym2_bs(const int Trig = 0, const int NBins = 1, const int Roadset = 57, const int Seed = 0, const int SaveOn = 0)
+void asym2_thirdday(const int Trig = 0, const int NBins = 5, const int Roadset = 67, const int Seed = 0, const int SaveOn = 0)
 {
   
   //gROOT -> ProcessLine ("~/root/init.C");
@@ -436,13 +436,13 @@ void asym2_bs(const int Trig = 0, const int NBins = 1, const int Roadset = 57, c
 
   TFile *inFile1 = new TFile (inName);
   gROOT -> cd();
-
+  
   // ====================================================== Read the reconstructed cluster pairs !!!
   TTree *YieldTree = (TTree*) inFile1 -> Get ("kdimuon"); 
   //YieldTree -> SetBranchAddress ("dimuonID",        &dimuonID);
   //YieldTree -> SetBranchAddress ("runID",           &runID);
   //YieldTree -> SetBranchAddress ("eventID",         &eventID);
-  //YieldTree -> SetBranchAddress ("spillID",         &spillID);
+  YieldTree -> SetBranchAddress ("spillID",         &spillID);
   //YieldTree -> SetBranchAddress ("posTrackID",    &posTrackID);
   //YieldTree -> SetBranchAddress ("negTrackID",    &negTrackID);
   //YieldTree -> SetBranchAddress ("posHits",    &posHits);
@@ -472,21 +472,25 @@ void asym2_bs(const int Trig = 0, const int NBins = 1, const int Roadset = 57, c
 
   //here's the for loop
   int nentries = YieldTree -> GetEntries();
+  int spillID0;
+  int daycount = 0;
+  int DspillID;
   cout << "Number of entries: " << nentries << endl;
   for (int i = 0; i < nentries; i++) {
-  //for (int i = 0; i < 10000; i++) {
+    //for (int i = 0; i < 10000; i++) {
     YieldTree -> GetEntry (i);
     if(i%100000 == 0) cout << "entry " << i << endl;
-
+    if(i == 0 ) spillID0 = spillID;
+    
     //Now do the kinematic cuts!
     xf = xF;
     lordm.SetXYZM(dpx, dpy, dpz, mass);
     pt = lordm.Pt();
     if(pt < 0.5) continue;
     //if(fabs(lordm.Py()/lordm.Px()) < 0.176 || fabs(lordm.Py()/lordm.Px()) > 5.67) continue;
-    if(fabs(lordm.Px()/lordm.Py()) < 0.176) continue;
+    //if(fabs(lordm.Px()/lordm.Py()) < 0.176) continue;
     phi = lordm.Phi();
-    if (i%10000 == 0)cout << "px,py,phi " << i << " " << lordm.Px() << " " << lordm.Py() << " " << lordm.Phi() << " " << lordm.Phi()*180/PI << endl;
+
     //make a left right phi!
     phi2 = phi - PI/2;
     if(phi2 < -PI){phi2 = phi2 + 2*PI;}
@@ -509,11 +513,21 @@ void asym2_bs(const int Trig = 0, const int NBins = 1, const int Roadset = 57, c
     if (k < 0) continue;
     if (k > nbins-1) k = nbins - 1;
     //if (k > nbins-1) continue;
-    //cout << i << " " << k << " " << xf <<  " " << rxy_i << " " << rxy_j << endl;
-    
-    //get the same event spincombo
-    polT = TRand -> Uniform(2);
-    if(i%100000 == 0)  cout << "entry, polT " << i << " " << polT <<  " " << target << endl;
+
+    //if(i == 0)cout << "entry, day, DspillID, polT " << i <<  " " << daycount << " " << DspillID << " " << polT <<endl;
+    DspillID = float(spillID - spillID0) / 433.;
+    //if((spillID - spillID0) / 650 > daycount){
+    if(DspillID > daycount){
+      if(Seed == 0){
+      if(DspillID%2 == 0)polT = 0;      
+      if(DspillID%2 == 1)polT = 1;      
+      }
+      else{
+	polT = TRand -> Uniform(2);
+      }
+      //cout << "entry, day, Dspill, DspillID, polT " << i <<  " " << daycount << " " << spillID - spillID0 << " " << DspillID << " " << polT <<endl;
+      daycount++;
+    }
 
     //cout << "arm, k, phiy, phib, phi " << i << " " << arm << " " << k << " " << phiyellow << " " << phiblue << " " << phi << endl;
     Yield[target][k][polT] -> Fill (mass, phi);
@@ -524,8 +538,6 @@ void asym2_bs(const int Trig = 0, const int NBins = 1, const int Roadset = 57, c
     yeta  -> Fill (eta);
     yxfmasspt  -> Fill (mass,xf,pt);
     yxfmasseta  -> Fill (mass,xf,eta);
-
-
     
   }
 
@@ -1148,7 +1160,7 @@ void asym2_bs(const int Trig = 0, const int NBins = 1, const int Roadset = 57, c
     xf_mean -> SetBinContent(0.5 + (binjump + k) , meanxf);
     pt_mean -> SetBinContent(0.5 + (binjump + k) , meanpt);
     eta_mean -> SetBinContent(0.5 + (binjump + k) , meaneta);
-
+    //exit(1);
   }
   
   //Let's get the average eta
@@ -1156,7 +1168,8 @@ void asym2_bs(const int Trig = 0, const int NBins = 1, const int Roadset = 57, c
   cout << "The mean of pseudo-rapidity is " << meaneta << endl;
 
   //Write out to OutFile!!
-  char *outNameText = "./results/asym2_roadset%d_nbins%d_seed%d.root";
+  char *outNameText = "./results/asym2_roadset%d_nbins%d_thirdday%d.root";
+  //char *outNameText = "./results/phicut_asym2_roadset%d_nbins%d_thirdday%d.root";
   sprintf (outName, outNameText, Roadset, nbins, Seed);
 
   TFile *outFile = new TFile (outName, "RECREATE");

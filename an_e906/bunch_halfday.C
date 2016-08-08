@@ -1,7 +1,7 @@
 #include <asym_funcs.C>
 #include <fit_funcs.C>
 
-void bunch(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
+void bunch_halfday(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
 {
 
   //general business
@@ -44,8 +44,9 @@ void bunch(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
   TH1F *bunch5[2][nbins];  TF1 *gausdist1[2][nbins];
   TF1 *gausdist5[2][nbins];
   TH1F *anval1[2][nbins];
-  TH1F *anval1err[2][nbins];
   TH1F *anval5[2][nbins];
+  TH1F *anval1err[2][nbins];
+  TH1F *anval5err[2][nbins];
 
   TH1F *fit_rndf1[2];
   TH1F *fit_rndf5[2];
@@ -74,14 +75,14 @@ void bunch(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
       }
 
       sprintf(Hname, "bunch1_target%d_xf%d", a, k);
-      sprintf(Tname, "Sqrt A_{N}/#sigma_{A_{N}} Event Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "Sqrt A_{N}/#sigma_{A_{N}} 1 Day Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
       bunch1[a][k] = new TH1F(Hname, Tname, 200, -5., 5);
       bunch1[a][k] -> GetYaxis() -> SetTitle("Counts");
       bunch1[a][k] -> GetXaxis() -> SetTitle("A_{N}^{b.s.}/#sigma_{A_{N}}");
       bunch1[a][k] -> Sumw2();
 
       sprintf(Hname, "bunch5_target%d_xf%d", a, k);
-      sprintf(Tname, "Pol A_{N} Event Shuff. for Roadset%d, %1.1f < x_FT} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "Pol A_{N} 1 Day Shuff. for Roadset%d, %1.1f < x_FT} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
       bunch5[a][k] = new TH1F(Hname, Tname, 200, -5., 5);
       bunch5[a][k] -> GetYaxis() -> SetTitle("Counts");
       bunch5[a][k] -> GetXaxis() -> SetTitle("A_{N}^{b.s.}/#sigma_{A_{N}}");
@@ -100,16 +101,23 @@ void bunch(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
       anval5[a][k] -> GetYaxis() -> SetTitle ("A_{N}");
 
       sprintf(Hname, "anval1_target%d_xf%d", a, k);
-      sprintf(Tname, "Sqrt A_{N} Event Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "Sqrt A_{N} 1 Day Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
       anval1[a][k] = new TH1F(Hname, Hname, 200, -.1, .1);
       anval1[a][k] -> GetYaxis() -> SetTitle ("Counts");
       anval1[a][k] -> GetXaxis() -> SetTitle ("A_{N}");
 
+
       sprintf(Hname, "anval1err_target%d_xf%d", a, k);
-      sprintf(Tname, "Sqrt #sigma_{A_{N}} Event Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "Sqrt #sigma_{A_{N}} 1 Day Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
       anval1err[a][k] = new TH1F(Hname, Hname, 200, -.1, .1);
       anval1err[a][k] -> GetYaxis() -> SetTitle ("Counts");
       anval1err[a][k] -> GetXaxis() -> SetTitle ("#sigma_{A_{N}}");
+
+      sprintf(Hname, "anval5err_target%d_xf%d", a, k);
+      sprintf(Tname, "Sqrt #sigma_{A_{N}} 1 Day Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      anval5err[a][k] = new TH1F(Hname, Hname, 200, -.1, .1);
+      anval5err[a][k] -> GetYaxis() -> SetTitle ("Counts");
+      anval5err[a][k] -> GetXaxis() -> SetTitle ("#sigma_{A_{N}}");
 
     }
   }
@@ -119,7 +127,7 @@ void bunch(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
   int ifile;
   TFile *inFile[NFILES];
   
-  sprintf(inName, "./results/asym2_roadset%d_nbins%d_seed0.root", Roadset, nbins);
+  sprintf(inName, "./results/asym2_roadset%d_nbins%d_halfday0.root", Roadset, nbins);
   TFile *inFile1 = new TFile(inName, "READ");
 
   Float_t an1_val, an1_err;  
@@ -127,8 +135,10 @@ void bunch(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
 
   for(int a = 0; a < 2; a++){
       sprintf(Hname, "xf_an1_target%d", a);
+      //sprintf(Hname, "xf_an6_target%d", a);
       Han1[a] = (TH1F*) inFile1 -> Get(Hname);
       sprintf(Hname, "xf_an5_target%d", a);
+      sprintf(Hname, "xf_an6_target%d", a);
       Han5[a] = (TH1F*) inFile1 -> Get(Hname);
   }
   //Let's load each BS file!!
@@ -136,7 +146,7 @@ void bunch(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
   for (int i = 0; i < NFILES; i++){
     if(i%1000 == 0)cout << "doing BS file seed" << i << "." << endl;
     //load the inFile   
-    if(Trig == 0) sprintf(inName, "./results/asym2_roadset%d_nbins%d_seed%d.root", Roadset, nbins, i);
+    if(Trig == 0) sprintf(inName, "./results/asym2_roadset%d_nbins%d_halfday%d.root", Roadset, nbins, i);
     //printf(inName);
     inFile[i] = new TFile(inName);
 
@@ -158,8 +168,10 @@ void bunch(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
       for (int k = 0; k < nbins; k++){ // These are the slices in xf !!!
 	//Get the bin value
 	sprintf(Hname,"xf_an1_target%d", a);
+	//sprintf(Hname,"xf_an6_target%d", a);
 	an1[a] = (TH1F*) inFile[i] -> Get(Hname);
 	sprintf(Hname,"xf_an5_target%d", a);
+	sprintf(Hname,"xf_an6_target%d", a);
 	an5[a] = (TH1F*) inFile[i] -> Get(Hname);
 	
 	an1_val = an1[a]-> GetBinContent(k + binjump);
@@ -174,6 +186,7 @@ void bunch(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
 	anval1[a][k] -> Fill(an1_val );
 	anval1err[a][k] -> Fill(an1_err );
 	anval5[a][k] -> Fill(an5_val );
+	anval5err[a][k] -> Fill(an5_err );
       }
     }
     //delete the file
@@ -207,6 +220,7 @@ void bunch(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
       ca5[a] -> cd (2*k + 1);
       bunch5[a][k] -> Fit(gausdist5[a][k],"R");
       bunch5[a][k] -> Draw();
+      anval5err[a][k] -> Draw();
       ca5[a] -> cd (2*k + 2);
       anval5[a][k] -> Draw();
       if(NBins == 1){
@@ -215,10 +229,10 @@ void bunch(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
       }
     }
     ca1[a] -> cd();
-    sprintf(Hname, "./bunch_an1_nbins%d_roadset%d_target%d.gif", nbins, Roadset, a);
+    sprintf(Hname, "./bunch_an1_halfday_nbins%d_roadset%d_target%d.gif", nbins, Roadset, a);
     ca1[a] -> SaveAs(Hname);
     ca5[a] -> cd();
-    sprintf(Hname, "./bunch_an5_nbins%d_roadset%d_target%d.gif", nbins, Roadset, a);
+    sprintf(Hname, "./bunch_an5_halfday_nbins%d_roadset%d_target%d.gif", nbins, Roadset, a);
     ca5[a] -> SaveAs(Hname);
   }
 
