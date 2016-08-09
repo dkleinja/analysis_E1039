@@ -20,34 +20,36 @@ MYSQL* con;
 void PrintHelp();
 int MysqlErrorCheck();
 
-clock_t time_delta;
-clock_t time_start;
+//stupid clock stuff
+time_t time_delta;
+time_t time_start;
+time_t time_end;
 double currenttime;
-void TimeStamp(clock_t starttime);
+void TimeStamp(time_t starttime);
 
 int main(int argc, char **argv)
 {
-  time_start = clock();
+  time (&time_start);
 
   bool listFromMysql = 1;
   bool setFile = false;
 
   bool kDim = 0;
   bool jDim = 0;
+  int roadset = 61;
 
   char inputFile[1000];
   char schemaOutput[100];
   char login[30], password[30], server[100];
 
-  int roadset = 59;
-
-  sprintf(schemaOutput, "cuts1489v1_merged_roadset%d_R005_V001", roadset);
-  //sprintf(login, "seaguest");
-  //sprintf(password, "qqbar2mu+mu-");
+  sprintf(schemaOutput, "test_dkleinja_merged_roadset%d_R005_V001", roadset);
+  sprintf(login, "seaguest");
+  sprintf(password, "qqbar2mu+mu-");
   //sprintf(server, "seaquel.physics.illinois.edu");
-  sprintf(login, "root");
-  sprintf(password, "");
-  sprintf(server, "localhost");
+  sprintf(server, "e906-db1.fnal.gov");
+  //sprintf(login, "root");
+  //sprintf(password, "");
+  //sprintf(server, "localhost");
   sprintf(inputFile, "merged_roadset%d_R005_V001", roadset);
   vector<string> schemaVector;
 
@@ -68,6 +70,8 @@ int main(int argc, char **argv)
       kDim = atoi(argv[j + 1]);
     if (!strcmp(argv[j], "-j"))
       jDim = atoi(argv[j + 1]);
+    if (!strcmp(argv[j], "-r"))
+      roadset = atoi(argv[j + 1]);
     if (!strcmp(argv[j], "-s"))
       strcpy(schemaOutput, argv[j + 1]);
     if (!strcmp(argv[j], "-l"))
@@ -85,6 +89,9 @@ int main(int argc, char **argv)
     }
   }
 
+
+  sprintf(schemaOutput, "test_dkleinja_merged_roadset%d_R005_V001", roadset);
+  sprintf(inputFile, "merged_roadset%d_R005_V001", roadset);
   con = mysql_init(NULL);
   mysql_real_connect(con, server, login, password, NULL, port, NULL, 0);
 
@@ -293,7 +300,7 @@ int main(int argc, char **argv)
                 "JOIN %s.Scaler AS s3 ON s3.spillID = Spill.spillID AND s3.scalerName = 'AfterInhMatrix1' AND s3.spillType = 'EOS' "
                 "JOIN tempRunList ON tempRunList.runID = Spill.runID "
                 "WHERE Spill.dataQuality = 0 "
-                "AND Spill.status = 0 "
+                //"AND Spill.status = 0 "
                 "AND targetPos BETWEEN 1 AND 7 "
                 "AND targetPos = Target.value "
                 "AND Spill.spillID != 0;",
@@ -593,7 +600,8 @@ int main(int argc, char **argv)
     sprintf(stmt, "DELETE FROM kDimuon USING kDimuon "
                   "LEFT JOIN kTrack AS t1 ON t1.spillID = kDimuon.spillID AND t1.trackID = kDimuon.posTrackID "
                   "LEFT JOIN kTrack AS t2 ON t2.spillID = kDimuon.spillID AND t2.trackID = kDimuon.negTrackID "
-                  "WHERE (t1.roadID * t2.roadID < 0) OR "
+                  "WHERE (t1.roadID * t2.roadID > 0) OR "
+                  //"WHERE t1.trackID IS NULL OR "
                   "t1.trackID IS NULL OR "
                   "t2.trackID IS NULL;");
     mysql_query(con, stmt);
@@ -694,6 +702,7 @@ int main(int argc, char **argv)
                   "chisq_dimuon > 15 OR "
                   "mass NOT BETWEEN 0 AND 10 OR "
                   "(px1 < 0 AND px2 > 0) OR "
+                  //"(px1 > 0 AND px2 < 0) OR "
                   "ABS(trackSeparation) > 250;");
     mysql_query(con, stmt);
       if (MysqlErrorCheck() == 1)
@@ -709,13 +718,162 @@ int main(int argc, char **argv)
     row = mysql_fetch_row(res);
     cout << row[0] << " dimuons after kDimuon cuts" <<endl;
 
+    //need to add kTrack momentums here
+    sprintf(stmt, "ALTER TABLE kDimuon ADD COLUMN posx1 DOUBLE, "
+            "ADD COLUMN posy1 DOUBLE, "
+            "ADD COLUMN posx3 DOUBLE, "
+            "ADD COLUMN posy3 DOUBLE, "
+            "ADD COLUMN negx1 DOUBLE, "
+            "ADD COLUMN negy1 DOUBLE, "
+            "ADD COLUMN negx3 DOUBLE, "
+            "ADD COLUMN negy3 DOUBLE, "
+            "ADD COLUMN negHits INT, "
+            "ADD COLUMN posHits INT");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+
+    sprintf(stmt, "UPDATE kDimuon SET posx1 = 0, posy1 = 0, posx3 = 0, posy3 = 0, negx1 = 0, negy1 = 0, negx3 = 0, negy3 = 0, negHits = 0, posHits = 0;");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+
+  sprintf(stmt, "UPDATE kDimuon, kTrack SET kDimuon.posx1=kTrack.x1 "
+            "WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.posTrackID = kTrack.TrackID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+
+    sprintf(stmt, "UPDATE kDimuon, kTrack SET kDimuon.posy1=kTrack.y1 "
+            "WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.posTrackID = kTrack.TrackID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+
+    sprintf(stmt, "UPDATE kDimuon, kTrack SET kDimuon.posx3=kTrack.x3 "
+            "WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.posTrackID = kTrack.TrackID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+
+    sprintf(stmt, "UPDATE kDimuon, kTrack SET kDimuon.posy3=kTrack.y3 "
+            "WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.posTrackID = kTrack.TrackID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    sprintf(stmt, "UPDATE kDimuon, kTrack SET kDimuon.negx1=kTrack.x1 "
+            "WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.negTrackID = kTrack.TrackID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+
+    sprintf(stmt, "UPDATE kDimuon, kTrack SET kDimuon.negy1=kTrack.y1 "
+            "WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.negTrackID = kTrack.TrackID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+
+    sprintf(stmt, "UPDATE kDimuon, kTrack SET kDimuon.negx3=kTrack.x3 "
+            "WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.negTrackID = kTrack.TrackID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+
+    sprintf(stmt, "UPDATE kDimuon, kTrack SET kDimuon.negy3=kTrack.y3 "
+            "WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.negTrackID = kTrack.TrackID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+
+    sprintf(stmt, "UPDATE kDimuon, kTrack SET kDimuon.negHits=kTrack.numHits "
+            "WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.negTrackID = kTrack.TrackID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+
+    sprintf(stmt, "UPDATE kDimuon, kTrack SET kDimuon.posHits=kTrack.numHits "
+            "WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.posTrackID = kTrack.TrackID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+
+    sprintf(stmt, "ALTER TABLE kDimuon ADD COLUMN m3hm DOUBLE, "
+            "ADD COLUMN m3hs DOUBLE, "
+            "ADD COLUMN m3vm DOUBLE, "
+            "ADD COLUMN m3vs DOUBLE");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+
+        sprintf(stmt, "UPDATE kDimuon SET m3hm = 0, m3hs = 0, m3vm = 0, m3vs = 0");
+    //sprintf(stmt, "UPDATE kDimuon SET m3hm = 0");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+
+       sprintf(stmt, "UPDATE kDimuon, Beam SET kDimuon.m3hm = Beam.value "
+            "WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M3TGHM'");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+
+    sprintf(stmt, "UPDATE kDimuon, Beam SET kDimuon.m3hs = Beam.value "
+            "WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M3TGHS'");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+
+    sprintf(stmt, "UPDATE kDimuon, Beam SET kDimuon.m3vm = Beam.value "
+            "WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M3TGVM'");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+
+    sprintf(stmt, "UPDATE kDimuon, Beam SET kDimuon.m3vs = Beam.value "
+            "WHERE kDimuon.spillID = Beam.spillID AND Beam.name = 'E:M3TGVS'");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+
+    sprintf(stmt, "ALTER TABLE Spill ADD COLUMN liveProton2 BIGINT;");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+
+    sprintf(stmt, "UPDATE Spill, Beam, BeamDAQ SET Spill.liveProton2 = Beam.value * (BeamDAQ.QIEsum - BeamDAQ.inhibit_block_sum - BeamDAQ.trigger_sum_no_inhibit) / BeamDAQ.QIEsum "
+            "WHERE Spill.spillID = Beam.spillID AND Spill.spillID = BeamDAQ.spillID AND Beam.name = 'S:G2SEM'");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+
     sprintf(stmt, "OPTIMIZE TABLES kDimuon, kTrack;");
     mysql_query(con, stmt);
-      if (MysqlErrorCheck() == 1)
-        return 1;
+    if (MysqlErrorCheck() == 1)
+      return 1;
     TimeStamp(time_start);
     mysql_store_result(con);
+
+    //ok, cleanup
+    TimeStamp(time_start);
+    sprintf(stmt, "DROP TABLE IF EXISTS Event, Target, Scaler;");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+
+
   }
+
 
   if (jDim) // Should add cuts here at some point
   {
@@ -760,10 +918,11 @@ int MysqlErrorCheck()
     return 0;
 }
 
-void TimeStamp(clock_t starttime)
+void TimeStamp(time_t starttime)
 {
-  time_delta = clock() - starttime;
-  currenttime = double(time_delta) / CLOCKS_PER_SEC;
+  time (&time_end);
+
+  double currenttime = difftime(time_end, starttime);
   //cout << "\t The start time was " << starttime <<  " seconds." << endl;
   cout << "\t Current Running time is " << currenttime <<  " seconds." << endl;
   //cout << "\t Current Running time is " << time_delta <<  " seconds." << endl;
