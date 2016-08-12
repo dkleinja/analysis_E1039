@@ -1189,7 +1189,7 @@ void asym2_thirdday(const int Trig = 0, const int NBins = 5, const int Roadset =
     eta_mean -> Write();
     yeta -> Write();
 
-    for (int a = Trig; a < Trig+1; a++) {
+    for (int a = 0; a < 2; a++) {
       
       xf_asymfit1[a] -> Write();
       

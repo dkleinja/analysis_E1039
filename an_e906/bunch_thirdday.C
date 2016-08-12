@@ -3,15 +3,17 @@
 
 void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
 {
-
   //general business
   gROOT -> ProcessLine (".L ./my_root_functions.C");
   gROOT -> ProcessLine (".L ./asym_funcs.C");
   //gROOT -> ProcessLine (".L ./fit_funcs.C");
   gROOT -> SetStyle("Plain");
   gStyle -> SetPalette (1);
-  gStyle -> SetOptStat(1);
+  gStyle -> SetOptStat(1110);
   gStyle -> SetOptFit(1);
+  //gStyle -> SetTitleSize(3);
+  gStyle -> SetStatW(0.3);
+  gStyle -> SetStatH(0.2);
 
    //general constants
   Float_t PI = 3.141592654;
@@ -59,9 +61,10 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
     else if(a == 1) sprintf (inType, "Azi");
 
     sprintf(Hname, "Hfit_rndf1_target%d", a);
-    Hfit_rndf1[a] = new TH1F (Hname, Hname, 100, 0., 10.);
+    sprintf(Tname, "#chi^{2}/(NDF-1) for #LT8 hour#GT spin change");
+    Hfit_rndf1[a] = new TH1F (Hname, Tname, 100, 0., 10.);
     sprintf(Hname, "Hfit_rndf5_target%d", a);
-    Hfit_rndf5[a] = new TH1F (Hname, Hname, 100, 0., 10.);
+    Hfit_rndf5[a] = new TH1F (Hname, Tname, 100, 0., 10.);
     Hfit_rndf1[a] -> GetXaxis() -> SetTitle ("#chi^{2} / (n.d.f. - 1)");
     Hfit_rndf5[a] -> GetXaxis() -> SetTitle ("#chi^{2} / (n.d.f. - 1)");
 
@@ -76,14 +79,14 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
       }
 
       sprintf(Hname, "bunch1_target%d_xf%d", a, k);
-      sprintf(Tname, "Sqrt A_{N}/#sigma_{A_{N}} 1 Day Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "Sqrt A_{N}/#sigma_{A_{N}} 8 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
       bunch1[a][k] = new TH1F(Hname, Tname, 200, -5., 5);
       bunch1[a][k] -> GetYaxis() -> SetTitle("Counts");
       bunch1[a][k] -> GetXaxis() -> SetTitle("A_{N}^{b.s.}/#sigma_{A_{N}}");
       bunch1[a][k] -> Sumw2();
 
       sprintf(Hname, "bunch5_target%d_xf%d", a, k);
-      sprintf(Tname, "Pol A_{N} 1 Day Shuff. for Roadset%d, %1.1f < x_FT} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "Pol A_{N} 8 hour Shuff. for Roadset%d, %1.1f < x_FT} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
       bunch5[a][k] = new TH1F(Hname, Tname, 200, -5., 5);
       bunch5[a][k] -> GetYaxis() -> SetTitle("Counts");
       bunch5[a][k] -> GetXaxis() -> SetTitle("A_{N}^{b.s.}/#sigma_{A_{N}}");
@@ -91,7 +94,6 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
 
       sprintf(Hname, "gausdist_target%d_xf%d", a, k);
       gausdist1[a][k] = new TF1(Hname, "gaus", -2, 2);
-      gausdist1[a][k] = new TF1(Hname, "gaus", 0.1, 0.1);
 
       sprintf(Hname, "gausdist_target%d_xf%d", a, k);
       gausdist5[a][k] = new TF1(Hname, "gaus", -2, 2);
@@ -103,21 +105,29 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
       anval5[a][k] -> GetYaxis() -> SetTitle ("A_{N}");
 
       sprintf(Hname, "anval1_target%d_xf%d", a, k);
-      sprintf(Tname, "Sqrt A_{N} 1 Day Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
-      anval1[a][k] = new TH1F(Hname, Hname, 200, -.1, .1);
+      sprintf(Tname, "A_{N} 8 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "A_{N} for #LT18 hour#GT spin change", Roadset, xfTitleMin, xfTitleMax, inArm);
+      anval1[a][k] = new TH1F(Hname, Tname, 200, -.1, .1);
       anval1[a][k] -> GetYaxis() -> SetTitle ("Counts");
       anval1[a][k] -> GetXaxis() -> SetTitle ("A_{N}");
 
 
       sprintf(Hname, "anval1err_target%d_xf%d", a, k);
-      sprintf(Tname, "Sqrt #sigma_{A_{N}} 1 Day Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
-      anval1err[a][k] = new TH1F(Hname, Hname, 200, -.1, .1);
+      sprintf(Tname, "Sqrt #sigma_{A_{N}} 8 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "#sigma_{A_{N}} for #LT8 hour#GT spin change", Roadset, xfTitleMin, xfTitleMax, inArm);
+      anval1err[a][k] = new TH1F(Hname, Tname, 200, -.1, .1);
       anval1err[a][k] -> GetYaxis() -> SetTitle ("Counts");
       anval1err[a][k] -> GetXaxis() -> SetTitle ("#sigma_{A_{N}}");
 
+      sprintf(Hname, "anval5_target%d_xf%d", a, k);
+      sprintf(Tname, "Pol A_{N} 8 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      anval5[a][k] = new TH1F(Hname, Tname, 200, -.1, .1);
+      anval5[a][k] -> GetXaxis() -> SetTitle ("Counts");
+      anval5[a][k] -> GetYaxis() -> SetTitle ("A_{N}");
+
       sprintf(Hname, "anval5err_target%d_xf%d", a, k);
-      sprintf(Tname, "Sqrt #sigma_{A_{N}} 1 Day Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
-      anval5err[a][k] = new TH1F(Hname, Hname, 200, -.1, .1);
+      sprintf(Tname, "Sqrt #sigma_{A_{N}} 8 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      anval5err[a][k] = new TH1F(Hname, Tname, 200, -.1, .1);
       anval5err[a][k] -> GetYaxis() -> SetTitle ("Counts");
       anval5err[a][k] -> GetXaxis() -> SetTitle ("#sigma_{A_{N}}");
 
@@ -130,6 +140,7 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
   TFile *inFile[NFILES];
   
   sprintf(inName, "./results/asym2_roadset%d_nbins%d_thirdday0.root", Roadset, nbins);
+  sprintf(inName, "./results_tighter/asym2_roadset%d_nbins%d_thirdday0.root", Roadset, nbins);
   TFile *inFile1 = new TFile(inName, "READ");
 
   Float_t an1_val, an1_err;  
@@ -145,10 +156,11 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
   }
   //Let's load each BS file!!
   //for (int i = 20001; i < 25001; i++){
-  for (int i = 0; i < NFILES; i++){
+  for (int i = 1; i < NFILES; i++){
     if(i%1000 == 0)cout << "doing BS file seed" << i << "." << endl;
     //load the inFile   
     sprintf(inName, "./results/asym2_roadset%d_nbins%d_thirdday%d.root", Roadset, nbins, i);
+    sprintf(inName, "./results_tighter/asym2_roadset%d_nbins%d_thirdday%d.root", Roadset, nbins, i);
     //printf(inName);
     inFile[i] = new TFile(inName);
 
@@ -161,6 +173,8 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
       //xf bin loop
       sprintf(Hname,"fit_rndf1_target%d", a);
       fit_rndf1[a] = (TH1F*) inFile[i] -> Get(Hname);
+      fit_rndf1[a] -> SetTitle(Tname);
+
       sprintf(Hname,"fit_rndf5_target%d", a);
       fit_rndf5[a] = (TH1F*) inFile[i] -> Get(Hname);
 
@@ -200,11 +214,12 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
   TCanvas *ca1[2];
   TCanvas *ca5[2];
   for(int a = Trig; a < Trig+1; a++){
+    //for(int a = Trig; a < Trig+1; a++){
     sprintf(Hname, "ca1%d", a);
-    ca1[a] = new TCanvas(Hname, Hname, 1800, 400*nbins);
+    ca1[a] = new TCanvas(Hname, Hname, 1500, 400*nbins);
     ca1[a] -> Divide(3, nbins);
     sprintf(Hname, "ca5%d", a);
-    ca5[a] = new TCanvas(Hname, Hname, 1800, 400*nbins);
+    ca5[a] = new TCanvas(Hname, Hname, 1500, 400*nbins);
     ca5[a] -> Divide(3, nbins);
 
     for (int k = 0; k < nbins; k++){ // These are the slices in xf !!!
