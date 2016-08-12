@@ -24,8 +24,9 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
   char inType[4];
   char inSign[20];
   char inTrig[5];
-  if(Trig == 0) sprintf (inTrig, "Real");
-  else if(Trig == 2) sprintf (inTrig, "Sim");
+  //if(Trig == 0) 
+  sprintf (inTrig, "Real");
+  //else if(Trig == 2) sprintf (inTrig, "Sim");
   const Int_t nbins = NBins;
   Int_t binjump = 3.5;
   if(NBins == 1) binjump = 4.5;
@@ -90,6 +91,7 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
 
       sprintf(Hname, "gausdist_target%d_xf%d", a, k);
       gausdist1[a][k] = new TF1(Hname, "gaus", -2, 2);
+      gausdist1[a][k] = new TF1(Hname, "gaus", 0.1, 0.1);
 
       sprintf(Hname, "gausdist_target%d_xf%d", a, k);
       gausdist5[a][k] = new TF1(Hname, "gaus", -2, 2);
@@ -146,7 +148,7 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
   for (int i = 0; i < NFILES; i++){
     if(i%1000 == 0)cout << "doing BS file seed" << i << "." << endl;
     //load the inFile   
-    if(Trig == 0) sprintf(inName, "./results/asym2_roadset%d_nbins%d_thirdday%d.root", Roadset, nbins, i);
+    sprintf(inName, "./results/asym2_roadset%d_nbins%d_thirdday%d.root", Roadset, nbins, i);
     //printf(inName);
     inFile[i] = new TFile(inName);
 
@@ -197,7 +199,7 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
   //Draw the BS values!
   TCanvas *ca1[2];
   TCanvas *ca5[2];
-  for(int a = 1; a < 2; a++){
+  for(int a = Trig; a < Trig+1; a++){
     sprintf(Hname, "ca1%d", a);
     ca1[a] = new TCanvas(Hname, Hname, 1800, 400*nbins);
     ca1[a] -> Divide(3, nbins);
@@ -206,25 +208,26 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
     ca5[a] -> Divide(3, nbins);
 
     for (int k = 0; k < nbins; k++){ // These are the slices in xf !!!
-      ca1[a] -> cd (2*k + 1);
+      ca1[a] -> cd (3*k + 1);
       bunch1[a][k] -> Fit(gausdist1[a][k],"R");
       bunch1[a][k] -> Draw();
       anval1err[a][k] -> Draw();
-      ca1[a] -> cd (2*k + 2);
+      ca1[a] -> cd (3*k + 2);
+      //anval1[a][k] -> Fit(gausdist1[a][k],"R");
       anval1[a][k] -> Draw();
       if(NBins == 1){
-	ca1[a] -> cd (2*k + 3);
+	ca1[a] -> cd (3*k + 3);
 	Hfit_rndf1[a] -> Draw();
       }
 
-      ca5[a] -> cd (2*k + 1);
+      ca5[a] -> cd (3*k + 1);
       bunch5[a][k] -> Fit(gausdist5[a][k],"R");
       bunch5[a][k] -> Draw();
       anval5err[a][k] -> Draw();
-      ca5[a] -> cd (2*k + 2);
+      ca5[a] -> cd (3*k + 2);
       anval5[a][k] -> Draw();
       if(NBins == 1){
-	ca5[a] -> cd (2*k + 3);
+	ca5[a] -> cd (3*k + 3);
 	Hfit_rndf5[a] -> Draw();
       }
     }

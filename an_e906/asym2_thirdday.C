@@ -60,7 +60,7 @@ void asym2_thirdday(const int Trig = 0, const int NBins = 5, const int Roadset =
   Int_t mbins = 140;
   Double_t mmin = 0.;
   Double_t mmax = 14;
-  const Int_t phibins = 8;
+  const Int_t phibins = 12;
   const Int_t cosbins = 32;
   Double_t phimin = -PI;
   Double_t phimax = +PI;
@@ -440,7 +440,7 @@ void asym2_thirdday(const int Trig = 0, const int NBins = 5, const int Roadset =
   // ====================================================== Read the reconstructed cluster pairs !!!
   TTree *YieldTree = (TTree*) inFile1 -> Get ("kdimuon"); 
   //YieldTree -> SetBranchAddress ("dimuonID",        &dimuonID);
-  //YieldTree -> SetBranchAddress ("runID",           &runID);
+  YieldTree -> SetBranchAddress ("runID",           &runID);
   //YieldTree -> SetBranchAddress ("eventID",         &eventID);
   YieldTree -> SetBranchAddress ("spillID",         &spillID);
   //YieldTree -> SetBranchAddress ("posTrackID",    &posTrackID);
@@ -456,6 +456,7 @@ void asym2_thirdday(const int Trig = 0, const int NBins = 5, const int Roadset =
   YieldTree -> SetBranchAddress ("mass",            &mass);
   YieldTree -> SetBranchAddress ("xF",              &xF);
   //YieldTree -> SetBranchAddress ("xB",              &xB);
+  YieldTree -> SetBranchAddress ("xT",              &xT);
   //YieldTree -> SetBranchAddress ("costh",              &costh);
   //YieldTree -> SetBranchAddress ("phi",              &phi);
   //YieldTree -> SetBranchAddress ("trackSeparation", &trackSeparation);
@@ -481,7 +482,8 @@ void asym2_thirdday(const int Trig = 0, const int NBins = 5, const int Roadset =
     YieldTree -> GetEntry (i);
     if(i%100000 == 0) cout << "entry " << i << endl;
     if(i == 0 ) spillID0 = spillID;
-    
+    if(runID > 13800 && runID < 14799)continue;
+    if(xT < 0.1 || xT > 0.4)continue;
     //Now do the kinematic cuts!
     xf = xF;
     lordm.SetXYZM(dpx, dpy, dpz, mass);
@@ -502,8 +504,11 @@ void asym2_thirdday(const int Trig = 0, const int NBins = 5, const int Roadset =
       if(Trig == 0 || Trig == 2){int k = int (10 * xf);}
     }
 
-    if(xf < 0.2 || xf > 0.7)continue;
-
+    if(nbins == 1){
+      if(xf < 0.2 || xf > 0.6)continue;}
+    else if(nbins > 1){
+      if(xf < 0.2 || xf > 0.7)continue;
+    }
     if(nbins == 1){k = 0;}
     else{
       int k = int (10 * (xf - 0.2));
@@ -1119,6 +1124,7 @@ void asym2_thirdday(const int Trig = 0, const int NBins = 5, const int Roadset =
   }  //End of Arms!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
 
   //Let's get the average pt, xf
+  /*
   for (int k = 0; k < nbins; k++) {
     //labels!
     float xfTitleMin, xfTitleMax;
@@ -1166,9 +1172,9 @@ void asym2_thirdday(const int Trig = 0, const int NBins = 5, const int Roadset =
   //Let's get the average eta
   meaneta = yeta -> GetMean();
   cout << "The mean of pseudo-rapidity is " << meaneta << endl;
-
+  */
   //Write out to OutFile!!
-  char *outNameText = "./results/asym2_roadset%d_nbins%d_thirdday%d.root";
+  char *outNameText = "./results_tighter/asym2_roadset%d_nbins%d_thirdday%d.root";
   //char *outNameText = "./results/phicut_asym2_roadset%d_nbins%d_thirdday%d.root";
   sprintf (outName, outNameText, Roadset, nbins, Seed);
 
@@ -1183,7 +1189,7 @@ void asym2_thirdday(const int Trig = 0, const int NBins = 5, const int Roadset =
     eta_mean -> Write();
     yeta -> Write();
 
-    for (int a = 0; a < 2; a++) {
+    for (int a = Trig; a < Trig+1; a++) {
       
       xf_asymfit1[a] -> Write();
       
