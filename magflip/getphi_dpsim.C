@@ -13,7 +13,7 @@
 /*
 This macro illustrates how to draw the dimuon mass/xF withing acceptance
 */
-void getphi_dpsim(int hodoeff = 1, int trigon = 0)
+void getphi_dpsim(int hodoeff = 0, int trigon = 1, int seed = 0)
 {
     gSystem->Load("libDPMCRawEvent.so");
 
@@ -41,7 +41,6 @@ void getphi_dpsim(int hodoeff = 1, int trigon = 0)
     TH1D *Hcsphi = new TH1D("Hcsphi", Tname, 32, -1.6, 1.6);
     Hcsphi -> SetMinimum(0.1);
     Hcsphi -> Sumw2();
-
     
     sprintf(Fname, "./nDST/dy_hodo%d_50M.root", hodoeff);
     //sprintf(Fname, "./nDST/dy_hodo%d_1M.root", hodoeff);
@@ -58,24 +57,28 @@ void getphi_dpsim(int hodoeff = 1, int trigon = 0)
     Float_t phi;
     
     int nentries = dataTree -> GetEntries();
-    cout << "The number of dimuon Entries is " << nentries << endl;
-    for(Int_t i = 0; i < dataTree->GetEntries(); ++i)
+    int startentry = seed*10000;
+    cout << "The number of dimuon Entries is " << nentries << ".  The seed start is " << startentry << endl;
+    for(Int_t i = 0; i < 10000; ++i)
     {
-        dataTree->GetEntry(i);
+        dataTree->GetEntry(i+startentry);
 	if(i%10000 == 0) cout << i << " Events. " << endl;
         //Normally there is only one dimuon per event
         //But pile-up of multiple dimuons is possible
 
 	//get trigger conditions
 	//if(trigon == 1){
-	  //DPMCHeader evt = rawEvent->eventHeader();
-	  //if((evt.fTriggerBit & 1) == 0) continue;
-	  //}
+	DPMCHeader evt = rawEvent->eventHeader();
+	if((evt.fTriggerBit & 1) == 0){
+	//if((evt.fTriggerBit%2 == 0)){
+	  //cout << i << "fTriggerBit is:  " << evt.fTriggerBit << endl;
+	  continue;
+	}
 	for(Int_t j = 0; j < rawEvent->getNDimuons(); ++j)
         {
 	  DPMCDimuon dimuon = rawEvent->getDimuon(j);
 	  
-	  if(!dimuon.fAccepted) continue;
+	  //if(!dimuon.fAccepted) continue;
 	  
 	  track1.SetPxPyPzE(dimuon.fPosMomentum.Px(), dimuon.fPosMomentum.Py(), dimuon.fPosMomentum.Pz(), dimuon.fPosMomentum.E());
 	  track2.SetPxPyPzE(dimuon.fNegMomentum.Px(), dimuon.fNegMomentum.Py(), dimuon.fNegMomentum.Pz(), dimuon.fNegMomentum.E());
@@ -94,7 +97,7 @@ void getphi_dpsim(int hodoeff = 1, int trigon = 0)
     TCanvas* c1 = new TCanvas();
     Hdmphi -> Draw();
    
-    sprintf(Fname, "./root_files/phidists_dpsim_hodoeff%d_trigon%d.root", hodoeff, trigon);
+    sprintf(Fname, "./root_files/phidists_dpsim_hodoeff%d_trigon%d_seed%d.root", hodoeff, trigon, seed);
     TFile *outfile = new TFile(Fname, "RECREATE");
     outfile -> cd();
     Hdmphi -> Write();

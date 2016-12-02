@@ -1,4 +1,4 @@
-void drawmagflip_dpsim(const int dmrebin = 4, const int hodoeff = 0)
+void drawmagflip_dpsim(const int dmrebin = 4, const int hodoeff = 1)
 {
 
   gStyle -> SetOptFit(1);
@@ -8,9 +8,9 @@ void drawmagflip_dpsim(const int dmrebin = 4, const int hodoeff = 0)
   char Hname[128];
   char Tname[128];
 
-  sprintf(Fname, "./root_files/phidists_dpsim_hodoeff0_trigon%d.root", hodoeff);
-  TFile *inFile0 = new TFile(Fname);
   sprintf(Fname, "./root_files/phidists_dpsim_hodoeff1_trigon%d.root", hodoeff);
+  TFile *inFile0 = new TFile(Fname);
+  sprintf(Fname, "./root_files/phidists_dpsim_hodoeff0_trigon%d.root", hodoeff);
   TFile *inFile1 = new TFile(Fname);
 
   TH1D *Hdmphi0 = (TH1D*) inFile0 -> Get("Hdmphi");
