@@ -265,7 +265,7 @@ int main(int argc, char **argv)
     return 1;
   TimeStamp(time_start);
 
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
+  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;");
   mysql_query(con, stmt);
   if (MysqlErrorCheck() == 1)
     return 1;
@@ -282,7 +282,7 @@ int main(int argc, char **argv)
     return 1;
   TimeStamp(time_start);
 
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
+  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;");
   mysql_query(con, stmt);
   if (MysqlErrorCheck() == 1)
     return 1;
@@ -290,42 +290,55 @@ int main(int argc, char **argv)
   res = mysql_store_result(con);
   row = mysql_fetch_row(res);
   cout << row[0] << " spills after Spill cuts" <<endl;
+
+  sprintf(stmt, "INSERT INTO Event SELECT Event.* FROM %s.Event JOIN "
+                 "tempSpillList ON tempSpillList.spillID = Event.spillID;",
+                 inputFile);
+  mysql_query(con, stmt);
+  if (MysqlErrorCheck() == 1)
+    return 1;
+  TimeStamp(time_start);
+
+  sprintf(stmt, "INSERT INTO mDimuon SELECT mDimuon.* FROM %s.mDimuon JOIN "
+                 "tempSpillList ON tempSpillList.spillID = mDimuon.spillID;",
+                 inputFile);
+  mysql_query(con, stmt);
+  if (MysqlErrorCheck() == 1)
+    return 1;
+  TimeStamp(time_start);
+
+  sprintf(stmt, "INSERT INTO mTrack SELECT mTrack.* FROM %s.mTrack JOIN "
+                 "tempSpillList ON tempSpillList.spillID = mTrack.spillID;",
+                 inputFile);
+  mysql_query(con, stmt);
+  if (MysqlErrorCheck() == 1)
+    return 1;
+  TimeStamp(time_start);
   
   if (kDim)
   {
-    /*
-    sprintf(stmt, "SELECT kDimuon.mass, kDimuon.eventID, kDimuon.spillID, Event.MATRIX1 FROM %s.kDimuon "
-	          "JOIN Spill ON kDimuon.spillID = Spill.spillID "
-	          "JOIN Event ON Event.spillID = kDimuon.spillID AND Event.eventID = kDimuon.eventID "
-	          //"JOIN Event ON Event.eventID = kDimuon.eventID "
-                  //"WHERE MATRIX1 > 0 LIMIT 100;", inputFile);
-                  ";", inputFile);
-    mysql_query(con, stmt);
-    if (MysqlErrorCheck() == 1)
-      return 1;
-    TimeStamp(time_start);
-    */
-
-     sprintf(stmt, "INSERT INTO kDimuon SELECT kDimuon.* FROM %s.kDimuon "
-                  "JOIN tempSpillList ON kDimuon.spillID = tempSpillList.spillID "
-                  "JOIN Event ON Event.spillID = kDimuon.spillID AND Event.eventID = kDimuon.eventID "
-                  "WHERE MATRIX1 > 0;", inputFile);
+    sprintf(stmt, "INSERT INTO kDimuon SELECT kDimuon.* FROM %s.kDimuon "
+	    "JOIN tempSpillList ON kDimuon.spillID = tempSpillList.spillID "
+	    "JOIN Event ON Event.spillID = kDimuon.spillID AND Event.eventID = kDimuon.eventID "
+	    "WHERE MATRIX1 > 0;", inputFile);
+	    //";", inputFile);
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
 
     sprintf(stmt, "INSERT INTO kTrack SELECT kTrack.* FROM %s.kTrack "
-                  "JOIN tempSpillList ON kTrack.spillID = tempSpillList.spillID "
-                  "JOIN Event ON Event.spillID = kTrack.spillID AND Event.eventID = kTrack.eventID "
-                  "WHERE MATRIX1 > 0;", inputFile);
+	    "JOIN tempSpillList ON kTrack.spillID = tempSpillList.spillID "
+	    "JOIN Event ON Event.spillID = kTrack.spillID AND Event.eventID = kTrack.eventID "
+	    "WHERE MATRIX1 > 0;", inputFile);
+            //";", inputFile);
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
 
   }
-
+  
   if (jDim)
   {
     sprintf(stmt, "INSERT INTO jDimuon SELECT jDimuon.* FROM %s.jDimuon; ",
@@ -361,7 +374,7 @@ int main(int argc, char **argv)
     res = mysql_store_result(con);
     row = mysql_fetch_row(res);
     cout << row[0] << " dimuons after spill cuts" <<endl;
-    exit(1);
+    //exit(1);
 
     sprintf(stmt, "DELETE FROM kTrack WHERE "
                   "numHits < 15 OR "
@@ -495,7 +508,7 @@ int main(int argc, char **argv)
     res = mysql_store_result(con);
     row = mysql_fetch_row(res);
     cout << row[0] << " dimuons after kDimuon cuts" <<endl;
-    /*
+    
     //need to add kTrack momentums here
     sprintf(stmt, "ALTER TABLE kDimuon ADD COLUMN posx1 DOUBLE, "
             "ADD COLUMN posy1 DOUBLE, "
@@ -564,7 +577,7 @@ int main(int argc, char **argv)
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
-    */
+    
     sprintf(stmt, "UPDATE kDimuon, kTrack SET kDimuon.negHits=kTrack.numHits "
             "WHERE kDimuon.spillID = kTrack.spillID AND kDimuon.negTrackID = kTrack.TrackID");
     mysql_query(con, stmt);
@@ -577,28 +590,28 @@ int main(int argc, char **argv)
     if (MysqlErrorCheck() == 1)
       return 1;
 
-    //add sigma weighting, kDimuon
+    //add sigma weighting and trigger, kDimuon
     sprintf(stmt, "ALTER TABLE kDimuon ADD COLUMN sigWeight DOUBLE; ");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
 
-        sprintf(stmt, "UPDATE kDimuon SET sigWeight = 0");
-    //sprintf(stmt, "UPDATE kDimuon SET m3hm = 0");
+
+    sprintf(stmt, "UPDATE kDimuon SET sigWeight = 0");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
 
-       sprintf(stmt, "UPDATE kDimuon, mDimuon SET kDimuon.sigWeight = mDimuon.sigWeight "
-            "WHERE kDimuon.eventID = mDimuon.eventID");
+    sprintf(stmt, "UPDATE kDimuon, mDimuon SET kDimuon.sigWeight = mDimuon.sigWeight "
+                  "WHERE kDimuon.eventID = mDimuon.eventID");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
 
-    //add sigma weighting, kDimuon
+    //add sigma weighting and trigger, kTrack
     sprintf(stmt, "ALTER TABLE kTrack ADD COLUMN sigWeight DOUBLE; ");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
@@ -612,13 +625,13 @@ int main(int argc, char **argv)
       return 1;
     TimeStamp(time_start);
 
-       sprintf(stmt, "UPDATE kTrack, mDimuon SET kTrack.sigWeight = mDimuon.sigWeight "
-            "WHERE kTrack.eventID = mDimuon.eventID");
+    sprintf(stmt, "UPDATE kTrack, mDimuon SET kTrack.sigWeight = mDimuon.sigWeight "
+                  "WHERE kTrack.eventID = mDimuon.eventID");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
-    
+
     sprintf(stmt, "OPTIMIZE TABLES kDimuon, kTrack;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
@@ -628,7 +641,7 @@ int main(int argc, char **argv)
 
     //ok, cleanup
     TimeStamp(time_start);
-    sprintf(stmt, "DROP TABLE IF EXISTS Event;");
+    sprintf(stmt, "DROP TABLE IF EXISTS Event, mTrack, mDimuon;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
