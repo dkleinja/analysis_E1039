@@ -107,7 +107,7 @@ int main(int argc, char **argv)
     TimeStamp(time_start);
 
   sprintf(stmt, "DROP TABLE IF EXISTS Run, Spill, Event, mDimuon, mTrack,"
-                " dimuonsAfterTrackCuts;");
+                "tempSpillList, dimuonsAfterTrackCuts;");
   mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
@@ -137,6 +137,12 @@ int main(int argc, char **argv)
     return 1;
   TimeStamp(time_start);
 
+  sprintf(stmt, "CREATE TABLE tempSpillList (spillID INT);");
+  mysql_query(con, stmt);
+  if (MysqlErrorCheck() == 1)
+    return 1;
+  TimeStamp(time_start);
+  
   if (kDim)
   {
     sprintf(stmt, "CREATE TABLE kDimuon SELECT * FROM %s.kDimuon LIMIT 1;", inputFile);  //I hate the default indices
@@ -145,7 +151,7 @@ int main(int argc, char **argv)
       return 1;
     TimeStamp(time_start);
 
-    sprintf(stmt, "DELETE FROM kDimuon;", inputFile);
+    sprintf(stmt, "DELETE FROM kDimuon;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
@@ -181,7 +187,7 @@ int main(int argc, char **argv)
       return 1;
     TimeStamp(time_start);
 
-    sprintf(stmt, "DELETE FROM kTrack;", inputFile);
+    sprintf(stmt, "DELETE FROM kTrack;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
@@ -246,29 +252,78 @@ int main(int argc, char **argv)
   res = mysql_store_result(con);
   row = mysql_fetch_row(res);
   cout << row[0] << " spills before spill cuts" <<endl;
+
+  sprintf(stmt, "INSERT INTO tempSpillList SELECT Spill.spillID FROM %s.Spill "
+                "WHERE Spill.dataQuality = 0 "
+                //"AND Spill.status = 0 "
+                "AND targetPos BETWEEN 1 AND 7 "
+                "AND Spill.spillID != 0;",
+	        inputFile);
+
+    mysql_query(con, stmt);
+  if (MysqlErrorCheck() == 1)
+    return 1;
+  TimeStamp(time_start);
+
+  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
+  mysql_query(con, stmt);
+  if (MysqlErrorCheck() == 1)
+    return 1;
+  TimeStamp(time_start);
+  res = mysql_store_result(con);
+  row = mysql_fetch_row(res);
+  cout << row[0] << " spills after Spill.dataQuality cuts" <<endl;
+
+  sprintf(stmt, "DELETE FROM tempSpillList USING tempSpillList JOIN "
+	        "(SELECT spillID FROM %s.Spill GROUP BY spillID HAVING COUNT(1) != 1) AS t1 "
+	        "ON t1.spillID = tempSpillList.spillID;", inputFile);
+  mysql_query(con, stmt);
+  if (MysqlErrorCheck() == 1)
+    return 1;
+  TimeStamp(time_start);
+
+  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
+  mysql_query(con, stmt);
+  if (MysqlErrorCheck() == 1)
+    return 1;
+  TimeStamp(time_start);
+  res = mysql_store_result(con);
+  row = mysql_fetch_row(res);
+  cout << row[0] << " spills after Spill cuts" <<endl;
   
   if (kDim)
   {
-    sprintf(stmt, "INSERT INTO kDimuon SELECT kDimuon.* FROM %s.kDimuon "
+    /*
+    sprintf(stmt, "SELECT kDimuon.mass, kDimuon.eventID, kDimuon.spillID, Event.MATRIX1 FROM %s.kDimuon "
 	          "JOIN Spill ON kDimuon.spillID = Spill.spillID "
 	          "JOIN Event ON Event.spillID = kDimuon.spillID AND Event.eventID = kDimuon.eventID "
 	          //"JOIN Event ON Event.eventID = kDimuon.eventID "
+                  //"WHERE MATRIX1 > 0 LIMIT 100;", inputFile);
+                  ";", inputFile);
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+    */
+
+     sprintf(stmt, "INSERT INTO kDimuon SELECT kDimuon.* FROM %s.kDimuon "
+                  "JOIN tempSpillList ON kDimuon.spillID = tempSpillList.spillID "
+                  "JOIN Event ON Event.spillID = kDimuon.spillID AND Event.eventID = kDimuon.eventID "
                   "WHERE MATRIX1 > 0;", inputFile);
-                  //";", inputFile);
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
 
     sprintf(stmt, "INSERT INTO kTrack SELECT kTrack.* FROM %s.kTrack "
-	          "JOIN Spill ON kTrack.spillID = Spill.spillID "
-	          "JOIN Event ON Event.spillID = kTrack.spillID AND Event.eventID = kTrack.eventID "
-	          "WHERE MATRIX1 > 0;", inputFile);
-	          //";", inputFile);
+                  "JOIN tempSpillList ON kTrack.spillID = tempSpillList.spillID "
+                  "JOIN Event ON Event.spillID = kTrack.spillID AND Event.eventID = kTrack.eventID "
+                  "WHERE MATRIX1 > 0;", inputFile);
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
+
   }
 
   if (jDim)
@@ -305,7 +360,8 @@ int main(int argc, char **argv)
     TimeStamp(time_start);
     res = mysql_store_result(con);
     row = mysql_fetch_row(res);
-    cout << row[0] << " dimuons after event cuts" <<endl;
+    cout << row[0] << " dimuons after spill cuts" <<endl;
+    exit(1);
 
     sprintf(stmt, "DELETE FROM kTrack WHERE "
                   "numHits < 15 OR "
