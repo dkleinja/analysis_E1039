@@ -84,7 +84,7 @@ int main(int argc, char **argv)
       port = atoi(argv[j+1]);
     if (!strcmp(argv[j], "-target"))
       tarvar = atoi(argv[j+1]);
-    if (!strcmp(argv[j], "-mag"))
+    if (!strcmp(argv[j], "-magnet"))
       magflip = atoi(argv[j+1]);
     
     if (!strcmp(argv[j], "-h") || !strcmp(argv[j], "-help"))
@@ -502,6 +502,7 @@ int main(int argc, char **argv)
       return 1;
     TimeStamp(time_start);
 
+    if(magflip == 0){
     sprintf(stmt, "DELETE FROM kDimuon WHERE "
                   "(ABS(dx) > 2 AND ABS(dy) > 2) OR "
                   "dz NOT BETWEEN -300 AND 200 OR "
@@ -515,6 +516,22 @@ int main(int argc, char **argv)
                   "(px1 < 0 AND px2 > 0) OR "
                   //"(px1 > 0 AND px2 < 0) OR "
                   "ABS(trackSeparation) > 250;");
+    }
+    if(magflip == 1){
+          sprintf(stmt, "DELETE FROM kDimuon WHERE "
+                  "(ABS(dx) > 2 AND ABS(dy) > 2) OR "
+                  "dz NOT BETWEEN -300 AND 200 OR "
+                  "(ABS(dpx) > 3 AND ABS(dpy) > 3) OR "
+                  "dpz NOT BETWEEN 30 AND 120 OR "
+                  "xF NOT BETWEEN -1 AND 1 OR "
+                  "xB NOT BETWEEN 0 AND 1 OR "
+                  "xT NOT BETWEEN 0 AND 1 OR "
+                  "chisq_dimuon > 15 OR "
+                  "mass NOT BETWEEN 0 AND 10 OR "
+                  //"(px1 < 0 AND px2 > 0) OR "
+                  "(px1 > 0 AND px2 < 0) OR "
+                  "ABS(trackSeparation) > 250;");
+    }
     mysql_query(con, stmt);
       if (MysqlErrorCheck() == 1)
         return 1;
@@ -639,7 +656,6 @@ int main(int argc, char **argv)
     TimeStamp(time_start);
 
     sprintf(stmt, "UPDATE kTrack SET sigWeight = 0");
-    //sprintf(stmt, "UPDATE kDimuon SET m3hm = 0");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
