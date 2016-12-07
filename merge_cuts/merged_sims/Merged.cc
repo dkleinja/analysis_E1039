@@ -34,15 +34,18 @@ int main(int argc, char **argv)
   bool listFromMysql = 1;
   bool setFile = false;
 
-  bool kDim = 0;
+  bool kDim = 1;
   bool jDim = 0;
-  int roadset = 61;
+  int tarvar = 2;
+  int magflip = 0;
+  char tardump[5];
+  int mvar = 13;
+  int svar = 1;
 
   char inputFile[1000];
   char schemaOutput[100];
   char login[30], password[30], server[100];
 
-  sprintf(schemaOutput, "test_dkleinja_mc_drellyan_C_M013_S001");
   sprintf(login, "seaguest");
   sprintf(password, "qqbar2mu+mu-");
   sprintf(server, "seaquel.physics.illinois.edu");
@@ -50,7 +53,6 @@ int main(int argc, char **argv)
   //sprintf(login, "root");
   //sprintf(password, "");
   //sprintf(server, "localhost");
-  sprintf(inputFile, "mc_drellyan_C_M013_S001");
   vector<string> schemaVector;
 
   int port = 3283;  // 3306 for most servers, 3283 for seaquel
@@ -70,8 +72,6 @@ int main(int argc, char **argv)
       kDim = atoi(argv[j + 1]);
     if (!strcmp(argv[j], "-j"))
       jDim = atoi(argv[j + 1]);
-    if (!strcmp(argv[j], "-r"))
-      roadset = atoi(argv[j + 1]);
     if (!strcmp(argv[j], "-s"))
       strcpy(schemaOutput, argv[j + 1]);
     if (!strcmp(argv[j], "-l"))
@@ -82,6 +82,11 @@ int main(int argc, char **argv)
       strcpy(server, argv[j + 1]);
     if (!strcmp(argv[j], "-port"))
       port = atoi(argv[j+1]);
+    if (!strcmp(argv[j], "-target"))
+      tarvar = atoi(argv[j+1]);
+    if (!strcmp(argv[j], "-mag"))
+      magflip = atoi(argv[j+1]);
+    
     if (!strcmp(argv[j], "-h") || !strcmp(argv[j], "-help"))
     {
       PrintHelp();
@@ -89,8 +94,23 @@ int main(int argc, char **argv)
     }
   }
 
-  sprintf(schemaOutput, "test_dkleinja_mc_drellyan_C_M013_S001");
-  sprintf(inputFile, "mc_drellyan_C_M013_S001");
+  if(tarvar == 0){
+    sprintf(tardump, "dump");
+  }
+  else if(tarvar == 1){
+    sprintf(tardump, "LD2");
+  }
+  else if(tarvar == 2){
+    sprintf(tardump, "C");
+  }
+  if(magflip == 1){
+    mvar = 14;
+    svar = 19;
+  }
+
+  
+  sprintf(schemaOutput, "test_dkleinja_mc_drellyan_%s_M0%d_S0%02d", tardump, mvar, svar);
+  sprintf(inputFile, "mc_drellyan_%s_M0%d_S0%02d", tardump, mvar, svar);
   con = mysql_init(NULL);
   mysql_real_connect(con, server, login, password, NULL, port, NULL, 0);
 
