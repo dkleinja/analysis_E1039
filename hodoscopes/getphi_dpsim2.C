@@ -45,8 +45,8 @@ void getphi_dpsim2(int batch = 0, int hodoEff = 0, int fileSeed = 0)
     TChain *dataTree = new TChain("save");
     int chainFirst = fileSeed*5;
     for(int i = chainFirst; i < chainFirst+5; i++){
-      sprintf(Fname, "./nDST/hodoscopes/batch%d_dy_hodo%d_100K_R005_%d.root", batch, hodoEff, i);
-      printf(Fname, "./nDST/hodoscopes/batch%d_dy_hodo%d_100K_R005_%d.root", batch, hodoEff, i);
+      sprintf(Fname, "./batch%d_dy_hodo%d_100K_R005_%d.root", batch, hodoEff, i);
+      printf(Fname, "./batch%d_dy_hodo%d_100K_R005_%d.root", batch, hodoEff, i);
       cout <<endl;
       dataTree -> Add(Fname);
     }
