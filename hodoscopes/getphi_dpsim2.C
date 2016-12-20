@@ -54,26 +54,29 @@ void getphi_dpsim2(int batch = 0, int hodoEff = 0, int fileSeed = 0)
     Float_t xF, xT, xB, mass;
     Float_t cs_costh, cs_phi;
     Float_t theta, phi;
-    Float_t dx, dy, dz;
-    Float_t dpx, dpy, dpz;
+    //Float_t dx, dy, dz;
+    Float_t dpx, dpy, dpz, dpt;
     Float_t px1, py1, pz1;
     Float_t px2, py2, pz2;
+    Float_t sigWeight;
     
     TTree *kdimuon = new TTree("dmHodos","dmHodos");
     //kdimuon -> Branch ("dx",          &dx,              "dx/F");
     //kdimuon -> Branch ("dy",          &dy,              "dy/F");
     //kdimuon -> Branch ("dz",          &dz,              "dz/F");
+    kdimuon -> Branch ("sigWeight",     &sigWeight,      "sigWeight/F");
     kdimuon -> Branch ("dpx",           &dpx,             "dpx/F");
     kdimuon -> Branch ("dpy",           &dpy,             "dpy/F");
     kdimuon -> Branch ("dpz",           &dpz,             "dpz/F");
+    kdimuon -> Branch ("dpt",           &dpt,             "dpt/F");
     kdimuon -> Branch ("mass",          &mass,            "mass/F");
     kdimuon -> Branch ("xF",            &xF,              "xF/F");
     kdimuon -> Branch ("xB",            &xB,              "xB/F");
     kdimuon -> Branch ("xT",            &xT,              "xT/F");
     kdimuon -> Branch ("cs_costh",      &cs_costh,        "cs_costh/F");
     kdimuon -> Branch ("cs_phi",        &cs_phi,          "cs_phi/F");
-    kdimuon -> Branch ("cs_phi",        &cs_phi,          "cs_phi/F");
-    kdimuon -> Branch ("cs_phi",        &cs_phi,          "cs_phi/F");
+    kdimuon -> Branch ("theta",         &theta,           "theta/F");
+    kdimuon -> Branch ("phi",           &phi,             "phi/F");
     kdimuon -> Branch ("px1",           &px1,             "px1/F");
     kdimuon -> Branch ("py1",           &py1,             "py1/F");
     kdimuon -> Branch ("pz1",           &pz1,             "pz1/F");
@@ -88,7 +91,6 @@ void getphi_dpsim2(int batch = 0, int hodoEff = 0, int fileSeed = 0)
     TLorentzVector lordm;// = new TLorentzVector;
     TLorentzVector track1;// = new TLorentzVector;
     TLorentzVector track2;// = new TLorentzVector;
-    Float_t phi;
     
     int nentries = dataTree -> GetEntries();
     cout << "The number of dimuon Entries is " << nentries << endl;
@@ -112,17 +114,29 @@ void getphi_dpsim2(int batch = 0, int hodoEff = 0, int fileSeed = 0)
 	  DPMCDimuon dimuon = rawEvent->getDimuon(j);
 	  
 	  //if(!dimuon.fAccepted) continue;
-	  
 	  track1.SetPxPyPzE(dimuon.fPosMomentum.Px(), dimuon.fPosMomentum.Py(), dimuon.fPosMomentum.Pz(), dimuon.fPosMomentum.E());
 	  track2.SetPxPyPzE(dimuon.fNegMomentum.Px(), dimuon.fNegMomentum.Py(), dimuon.fNegMomentum.Pz(), dimuon.fNegMomentum.E());
 	  lordm = track1 + track2;
-	  if(lordm.Pt() < 1.)continue;
+	  if(lordm.Pt() < 0.5) continue;
+	  dpt = lordm.Pt();
+	  dpx = lordm.Px(), dpy = lordm.Py(), dpz = lordm.Pz();
+	  xF = dimuon.fxF;
+	  xB = dimuon.fx1;
+	  xT = dimuon.fx2;
+	  mass = dimuon.fMass;
+	  cs_costh = dimuon.fCosTh;
+	  cs_phi = dimuon.fPhi;
+	  px1 = dimuon.fPosMomentum.Px(); py1 = dimuon.fPosMomentum.Py(); pz1 =  dimuon.fPosMomentum.Pz();
+	  px2 = dimuon.fNegMomentum.Px(); py2 = dimuon.fNegMomentum.Py(); pz2 =  dimuon.fNegMomentum.Pz();
+	  
 	  phi = lordm.Phi();
-	  double weight = rawEvent->eventHeader().fSigWeight;
-	  Hdmphi -> Fill(phi, weight);
-	  Hpmuonphi -> Fill(track1.Phi(), weight);
-	  Hmmuonphi -> Fill(track2.Phi(), weight);
-	  Hcsphi -> Fill(dimuon.fPhi, weight);
+	  theta = lordm.Theta();
+	  sigWeight = rawEvent->eventHeader().fSigWeight;
+	  Hdmphi -> Fill(phi, sigWeight);
+	  Hpmuonphi -> Fill(track1.Phi(), sigWeight);
+	  Hmmuonphi -> Fill(track2.Phi(), sigWeight);
+	  Hcsphi -> Fill(dimuon.fPhi, sigWeight);
+	  kdimuon -> Fill();
 	  //rawEvent -> clear();
 	}
     }
@@ -133,10 +147,12 @@ void getphi_dpsim2(int batch = 0, int hodoEff = 0, int fileSeed = 0)
     sprintf(Fname, "./root_files/phidists_dpsim_batch%d_hodoEff%d_seed%d.root", batch, hodoEff, fileSeed);
     TFile *outfile = new TFile(Fname, "RECREATE");
     outfile -> cd();
+    kdimuon -> Write();
     Hdmphi -> Write();
     Hpmuonphi -> Write();
     Hmmuonphi -> Write();
     Hcsphi -> Write();
+    
     
 }
 
