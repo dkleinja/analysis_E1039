@@ -58,6 +58,7 @@ void getphi_dpsim2(int batch = 0, int hodoEff = 0, int fileSeed = 0)
     Float_t dpx, dpy, dpz, dpt;
     Float_t px1, py1, pz1;
     Float_t px2, py2, pz2;
+    Float_t e1, e2;
     Float_t sigWeight;
     
     TTree *kdimuon = new TTree("dmHodos","dmHodos");
@@ -80,9 +81,11 @@ void getphi_dpsim2(int batch = 0, int hodoEff = 0, int fileSeed = 0)
     kdimuon -> Branch ("px1",           &px1,             "px1/F");
     kdimuon -> Branch ("py1",           &py1,             "py1/F");
     kdimuon -> Branch ("pz1",           &pz1,             "pz1/F");
+    kdimuon -> Branch ("e1",            &e1,              "e1/F");
     kdimuon -> Branch ("px2",           &px2,             "px2/F");
     kdimuon -> Branch ("py2",           &py2,             "py2/F");
     kdimuon -> Branch ("pz2",           &pz2,             "pz2/F");
+    kdimuon -> Branch ("e2",            &e2,              "e2/F");
       
     DPMCRawEvent* rawEvent = new DPMCRawEvent;
     dataTree->SetBranchAddress("rawEvent", &rawEvent);
@@ -117,7 +120,6 @@ void getphi_dpsim2(int batch = 0, int hodoEff = 0, int fileSeed = 0)
 	  track1.SetPxPyPzE(dimuon.fPosMomentum.Px(), dimuon.fPosMomentum.Py(), dimuon.fPosMomentum.Pz(), dimuon.fPosMomentum.E());
 	  track2.SetPxPyPzE(dimuon.fNegMomentum.Px(), dimuon.fNegMomentum.Py(), dimuon.fNegMomentum.Pz(), dimuon.fNegMomentum.E());
 	  lordm = track1 + track2;
-	  if(lordm.Pt() < 0.5) continue;
 	  dpt = lordm.Pt();
 	  dpx = lordm.Px(), dpy = lordm.Py(), dpz = lordm.Pz();
 	  xF = dimuon.fxF;
@@ -126,16 +128,18 @@ void getphi_dpsim2(int batch = 0, int hodoEff = 0, int fileSeed = 0)
 	  mass = dimuon.fMass;
 	  cs_costh = dimuon.fCosTh;
 	  cs_phi = dimuon.fPhi;
-	  px1 = dimuon.fPosMomentum.Px(); py1 = dimuon.fPosMomentum.Py(); pz1 =  dimuon.fPosMomentum.Pz();
-	  px2 = dimuon.fNegMomentum.Px(); py2 = dimuon.fNegMomentum.Py(); pz2 =  dimuon.fNegMomentum.Pz();
+	  px1 = dimuon.fPosMomentum.Px(); py1 = dimuon.fPosMomentum.Py(); pz1 =  dimuon.fPosMomentum.Pz(); e1 =  dimuon.fPosMomentum.E();
+	  px2 = dimuon.fNegMomentum.Px(); py2 = dimuon.fNegMomentum.Py(); pz2 =  dimuon.fNegMomentum.Pz(); e2 =  dimuon.fNegMomentum.E();
 	  
 	  phi = lordm.Phi();
 	  theta = lordm.Theta();
 	  sigWeight = rawEvent->eventHeader().fSigWeight;
-	  Hdmphi -> Fill(phi, sigWeight);
-	  Hpmuonphi -> Fill(track1.Phi(), sigWeight);
-	  Hmmuonphi -> Fill(track2.Phi(), sigWeight);
-	  Hcsphi -> Fill(dimuon.fPhi, sigWeight);
+	  if(lordm.Pt() > 0.5){
+	    Hdmphi -> Fill(phi, sigWeight);
+	    Hpmuonphi -> Fill(track1.Phi(), sigWeight);
+	    Hmmuonphi -> Fill(track2.Phi(), sigWeight);
+	    Hcsphi -> Fill(dimuon.fPhi, sigWeight);
+	  }
 	  kdimuon -> Fill();
 	  //rawEvent -> clear();
 	}
