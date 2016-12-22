@@ -1,7 +1,7 @@
 #include <asym_funcs.C>
 #include <fit_funcs.C>
 
-void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
+void bunch_thirdday(const int Trig = 1, const int Roadset = 67, const int NBins = 1)
 {
   //general business
   gROOT -> ProcessLine (".L ./my_root_functions.C");
@@ -93,17 +93,18 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
       bunch5[a][k] -> Sumw2();
 
       sprintf(Hname, "gausdist_target%d_xf%d", a, k);
-      gausdist1[a][k] = new TF1(Hname, "gaus", -2, 2);
+      //gausdist1[a][k] = new TF1(Hname, "gaus", -2, 2);
+      gausdist1[a][k] = new TF1(Hname, "gaus", -0.1, 0.1);
 
       sprintf(Hname, "gausdist_target%d_xf%d", a, k);
       gausdist5[a][k] = new TF1(Hname, "gaus", -2, 2);
-
+/*
       sprintf(Hname, "anval5_target%d_xf%d", a, k);
       sprintf(Tname, "Sqrt A_{N} #chi^{2}/NDF for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
       anval5[a][k] = new TH1F(Hname, Hname, 200, -.1, .1);
       anval5[a][k] -> GetXaxis() -> SetTitle ("Counts");
       anval5[a][k] -> GetYaxis() -> SetTitle ("A_{N}");
-
+*/
       sprintf(Hname, "anval1_target%d_xf%d", a, k);
       sprintf(Tname, "A_{N} 8 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
       sprintf(Tname, "A_{N} for #LT8 hour#GT spin change", Roadset, xfTitleMin, xfTitleMax, inArm);
@@ -135,7 +136,7 @@ void bunch_thirdday(const int Trig = 0, const int Roadset = 67, const int NBins 
   }
 
   //inFiles
-  const int NFILES = 5000;
+  const int NFILES = 15000;
   int ifile;
   TFile *inFile[NFILES];
   

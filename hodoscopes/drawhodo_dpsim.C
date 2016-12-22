@@ -1,27 +1,37 @@
-void drawmagflip_dpsim(const int dmrebin = 4, const int hodoeff = 0)
+void drawmagflip_dpsim(const int dmrebin = 4, const int hodoeff = 1)
 {
-
+  gStyle -> SetOptStat(0);
   gStyle -> SetOptFit(1);
   const Float_t PI = 3.14159;
 
   char Fname[128];
   char Hname[128];
   char Tname[128];
-
-  sprintf(Fname, "./root_files/phidists_dpsim_hodoeff0_trigon%d.root", hodoeff);
+  char onoff[4];
+  if(hodoeff == 0)sprintf(onoff, "off");
+  if(hodoeff == 1)sprintf(onoff, "on");
+  
+  sprintf(Fname, "./root_files/phidists_dpsim_hodoeff1_trigon%d_R005.root", hodoeff);
   TFile *inFile0 = new TFile(Fname);
-  sprintf(Fname, "./root_files/phidists_dpsim_hodoeff1_trigon%d.root", hodoeff);
+  sprintf(Fname, "./root_files/phidists_dpsim_hodoeff0_trigon%d_R005.root", hodoeff);
   TFile *inFile1 = new TFile(Fname);
 
   TH1D *Hdmphi0 = (TH1D*) inFile0 -> Get("Hdmphi");
   TH1D *Hdmphi1 = (TH1D*) inFile1 -> Get("Hdmphi");
-  sprintf(Tname, "phi of dimuon hodoeff=%d", hodoeff);
+  sprintf(Tname, "phi of dimuon, hodoeff on");
+  Hdmphi0 -> SetTitle(Tname);
+  sprintf(Tname, "phi of dimuon, hodoeff off");
+  Hdmphi1 -> SetTitle(Tname);
+  sprintf(Tname, "phi of dimuon hodoeff on/off");
   TH1D *Hdmphirat = new TH1D("Hdmphirat", Tname, 64, -3.15, 3.15);
-
+  Hdmphi0 -> SetMinimum(0.1);
+  Hdmphi1 -> SetMinimum(0.1);
+   
   TH1D *Hmmuonphi0 = (TH1D*) inFile0 -> Get("Hmmuonphi");
   TH1D *Hmmuonphi1 = (TH1D*) inFile1 -> Get("Hmmuonphi");
   TH1D *Hpmuonphi0 = (TH1D*) inFile0 -> Get("Hpmuonphi");
   TH1D *Hpmuonphi1 = (TH1D*) inFile1 -> Get("Hpmuonphi");
+
   //sprintf(Tname, "#phi of  roadset%d(#mu^{-}) / [roadset%d(#mu^{+}) * rellum]", roadset0, roadset1);
   TH1D *Hmpmuonphirat = new TH1D("Hmpmuonphirat", Tname, 64, -3.15, 3.15);
   //sprintf(Tname, "#phi of  roadset%d(#mu^{+}) / [roadset%d(#mu^{-}) * rellum]", roadset0, roadset1);
@@ -86,6 +96,9 @@ void drawmagflip_dpsim(const int dmrebin = 4, const int hodoeff = 0)
     Hdmphirat -> Rebin(16);
   }
   Hdmphirat -> Divide(Hdmphi0, Hdmphi1, 1, 1);
+  Hdmphirat -> SetMinimum(0.7);
+  Hdmphirat -> SetMaximum(1.01);
+
   Hmpmuonphirat -> Divide(Hmmuonphi0, Hpmuonphi1, 1, 1);
   Hpmmuonphirat -> Divide(Hpmuonphi0, Hmmuonphi1, 1, 1);
   Hmmmuonphirat -> Divide(Hmmuonphi0, Hmmuonphi1, 1, 1);
@@ -106,7 +119,7 @@ void drawmagflip_dpsim(const int dmrebin = 4, const int hodoeff = 0)
   //Hdmphirat -> Fit(cos1x);
   l0 -> Draw();
   sprintf(Hname, "./images/dimuon_dpsim_hodo%d.gif", hodoeff);
-  //c3 -> SaveAs(Hname);
+  c3 -> SaveAs(Hname);
   /*
    TCanvas *c6a = new TCanvas("c6a", "c6a", 1800, 800);
   c6a -> Divide(3, 2);

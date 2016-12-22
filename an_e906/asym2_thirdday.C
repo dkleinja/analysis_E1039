@@ -482,7 +482,7 @@ void asym2_thirdday(const int Trig = 0, const int NBins = 1, const int Roadset =
     YieldTree -> GetEntry (i);
     if(i%100000 == 0) cout << "entry " << i << endl;
     if(i == 0 ) spillID0 = spillID;
-    if(runID > 13800 && runID < 14799)continue;
+    //if(runID > 13800 && runID < 14799)continue;
     if(xT < 0.1 || xT > 0.4)continue;
     //Now do the kinematic cuts!
     xf = xF;
@@ -534,6 +534,7 @@ void asym2_thirdday(const int Trig = 0, const int NBins = 1, const int Roadset =
       daycount++;
     }
 
+    if(runID > 13800 && runID < 14799)continue;
     //cout << "arm, k, phiy, phib, phi " << i << " " << arm << " " << k << " " << phiyellow << " " << phiblue << " " << phi << endl;
     Yield[target][k][polT] -> Fill (mass, phi);
     Yield2[target][k][polT] -> Fill (mass, phi2);
