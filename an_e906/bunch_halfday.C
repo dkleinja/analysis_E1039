@@ -1,7 +1,7 @@
 #include <asym_funcs.C>
 #include <fit_funcs.C>
 
-void bunch_halfday(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
+void bunch_halfday(const int Trig = 1, const int Roadset = 67, const int NBins = 1)
 {
 
   //general business
@@ -62,7 +62,7 @@ void bunch_halfday(const int Trig = 0, const int Roadset = 67, const int NBins =
     else if(a == 1) sprintf (inType, "Azi");
 
     sprintf(Hname, "Hfit_rndf1_target%d", a);
-    sprintf(Tname, "#chi^{2}/(NDF-1) for #LT8 hour#GT spin change");
+    sprintf(Tname, "#chi^{2}/(NDF-1) for #LT12 hour#GT spin change");
     Hfit_rndf1[a] = new TH1F (Hname, Tname, 100, 0., 10.);
     sprintf(Hname, "Hfit_rndf5_target%d", a);
     Hfit_rndf5[a] = new TH1F (Hname, Tname, 100, 0., 10.);
@@ -80,14 +80,14 @@ void bunch_halfday(const int Trig = 0, const int Roadset = 67, const int NBins =
       }
 
       sprintf(Hname, "bunch1_target%d_xf%d", a, k);
-      sprintf(Tname, "Sqrt A_{N}/#sigma_{A_{N}} 8 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "Sqrt A_{N}/#sigma_{A_{N}} 12 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
       bunch1[a][k] = new TH1F(Hname, Tname, 200, -5., 5);
       bunch1[a][k] -> GetYaxis() -> SetTitle("Counts");
       bunch1[a][k] -> GetXaxis() -> SetTitle("A_{N}^{b.s.}/#sigma_{A_{N}}");
       bunch1[a][k] -> Sumw2();
 
       sprintf(Hname, "bunch5_target%d_xf%d", a, k);
-      sprintf(Tname, "Pol A_{N} 8 hour Shuff. for Roadset%d, %1.1f < x_FT} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "Pol A_{N} 12 hour Shuff. for Roadset%d, %1.1f < x_FT} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
       bunch5[a][k] = new TH1F(Hname, Tname, 200, -5., 5);
       bunch5[a][k] -> GetYaxis() -> SetTitle("Counts");
       bunch5[a][k] -> GetXaxis() -> SetTitle("A_{N}^{b.s.}/#sigma_{A_{N}}");
@@ -106,22 +106,22 @@ void bunch_halfday(const int Trig = 0, const int Roadset = 67, const int NBins =
       anval5[a][k] -> GetYaxis() -> SetTitle ("A_{N}");
 
       sprintf(Hname, "anval1_target%d_xf%d", a, k);
-      sprintf(Tname, "A_{N} 8 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
-      sprintf(Tname, "A_{N} for #LT18 hour#GT spin change", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "A_{N} 12 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "A_{N} for #LT12 hour#GT spin change", Roadset, xfTitleMin, xfTitleMax, inArm);
       anval1[a][k] = new TH1F(Hname, Tname, 200, -.1, .1);
       anval1[a][k] -> GetYaxis() -> SetTitle ("Counts");
       anval1[a][k] -> GetXaxis() -> SetTitle ("A_{N}");
 
 
       sprintf(Hname, "anval1err_target%d_xf%d", a, k);
-      sprintf(Tname, "Sqrt #sigma_{A_{N}} 8 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
-      sprintf(Tname, "#sigma_{A_{N}} for #LT8 hour#GT spin change", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "Sqrt #sigma_{A_{N}} 12 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "#sigma_{A_{N}} for #LT12 hour#GT spin change", Roadset, xfTitleMin, xfTitleMax, inArm);
       anval1err[a][k] = new TH1F(Hname, Tname, 200, -.1, .1);
       anval1err[a][k] -> GetYaxis() -> SetTitle ("Counts");
       anval1err[a][k] -> GetXaxis() -> SetTitle ("#sigma_{A_{N}}");
 
       sprintf(Hname, "anval5err_target%d_xf%d", a, k);
-      sprintf(Tname, "Sqrt #sigma_{A_{N}} 8 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "Sqrt #sigma_{A_{N}} 12 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
       anval5err[a][k] = new TH1F(Hname, Tname, 200, -.1, .1);
       anval5err[a][k] -> GetYaxis() -> SetTitle ("Counts");
       anval5err[a][k] -> GetXaxis() -> SetTitle ("#sigma_{A_{N}}");
@@ -130,7 +130,7 @@ void bunch_halfday(const int Trig = 0, const int Roadset = 67, const int NBins =
   }
 
   //inFiles
-  const int NFILES = 5000;
+  const int NFILES = 15000;
   int ifile;
   TFile *inFile[NFILES];
   

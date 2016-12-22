@@ -19,7 +19,7 @@ using namespace std;
 #include <my_root_functions.C>
 #include <asym_funcs.C>
 
-void asym2_thirdday(const int Trig = 0, const int NBins = 5, const int Roadset = 67, const int Seed = 0, const int SaveOn = 0)
+void asym2_thirdday(const int Trig = 0, const int NBins = 1, const int Roadset = 67, const int Seed = 0, const int SaveOn = 0)
 {
   
   //gROOT -> ProcessLine ("~/root/init.C");
