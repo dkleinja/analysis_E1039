@@ -1,11 +1,25 @@
 #! /bin/bash
 
-for roadset in 57 59 61 62 67 70
+echo -n "Enter the first number --> "
+#read roadse
+roadset=${BASH_ARGV[1]}
+seed=${BASH_ARGV[0]}
+#echo -n "The roadset is ${roadset}"
+#echo "${BASH_ARGV[0]}"
+if(seed = 1)
+then
+echo "root.exe asym2_2days.C\(0,1,${roadset},0,1\)";
+root.exe -b -q asym2_2days.C\(0,1,${roadset},0,1\)
+echo "root.exe asym2_2days.C\(0,5,${roadset},0,1\)";
+root.exe -b -q asym2_2days.C\(0,5,${roadset},0,1\)
+fi
+#for((i = 1; i < 501; i++))
+for((i = seed; i < seed+1001; i++))
 do
-
-echo "root.exe asym2.C\(0,1,${roadset}\)";
-root.exe -b -q asym2.C\(0,1,${roadset}\)
-echo "root.exe asym2.C\(0,5,${roadset}\)";
-root.exe -b -q asym2.C\(0,5,${roadset}\)
+echo "$i"
+echo "root.exe asym2_2days.C\(0,1,${roadset},$i\)";
+root.exe -b -q asym2_2days.C\(0,1,${roadset},$i\)
+echo "root.exe asym2_2days.C\(0,5,${roadset},$i\)";
+root.exe -b -q asym2_2days.C\(0,5,${roadset},$i\)
 
 done
