@@ -36,21 +36,22 @@ int main(int argc, char **argv)
 
   bool kDim = 0;
   bool jDim = 0;
-  int roadset = 61;
+  int roadset = 62;
+  int production = 5;
 
   char inputFile[1000];
   char schemaOutput[100];
   char login[30], password[30], server[100];
 
-  sprintf(schemaOutput, "test_dkleinja_merged_roadset%d_R005_V001", roadset);
+  sprintf(schemaOutput, "test_dkleinja_merged_roadset%d_R00%d_V001", roadset, production);
   sprintf(login, "seaguest");
   sprintf(password, "qqbar2mu+mu-");
   //sprintf(server, "seaquel.physics.illinois.edu");
-  sprintf(server, "e906-db1.fnal.gov");
+  sprintf(server, "e906-db3.fnal.gov");
   //sprintf(login, "root");
   //sprintf(password, "");
   //sprintf(server, "localhost");
-  sprintf(inputFile, "merged_roadset%d_R005_V001", roadset);
+  sprintf(inputFile, "merged_roadset%d_R00%d_V001", roadset, production);
   vector<string> schemaVector;
 
   int port = 3306;  // 3306 for most servers, 3283 for seaquel
@@ -90,8 +91,8 @@ int main(int argc, char **argv)
   }
 
 
-  sprintf(schemaOutput, "test_dkleinja_merged_roadset%d_R005_V001", roadset);
-  sprintf(inputFile, "merged_roadset%d_R005_V001", roadset);
+  sprintf(schemaOutput, "test_dkleinja_merged_roadset%d_R00%d_V001", roadset, production);
+  sprintf(inputFile, "merged_roadset%d_R00%d_V001", roadset, production);
   con = mysql_init(NULL);
   mysql_real_connect(con, server, login, password, NULL, port, NULL, 0);
 
