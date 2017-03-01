@@ -36,8 +36,8 @@ int main(int argc, char **argv)
 
   bool kDim = 0;
   bool jDim = 0;
-  int roadset = 62;
-  int production = 5;
+  int roadset = 61;
+  int production = 6;
 
   char inputFile[1000];
   char schemaOutput[100];
@@ -158,7 +158,7 @@ int main(int argc, char **argv)
       return 1;
     TimeStamp(time_start);
 
-    sprintf(stmt, "DELETE FROM kDimuon;", inputFile);
+    sprintf(stmt, "DELETE FROM kDimuon;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
@@ -194,7 +194,7 @@ int main(int argc, char **argv)
       return 1;
     TimeStamp(time_start);
 
-    sprintf(stmt, "DELETE FROM kTrack;", inputFile);
+    sprintf(stmt, "DELETE FROM kTrack;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
@@ -262,6 +262,12 @@ int main(int argc, char **argv)
   if (MysqlErrorCheck() == 1)
     return 1;
     TimeStamp(time_start);
+
+  sprintf(stmt, "CREATE TABLE IF NOT EXISTS QIE LIKE %s.QIE;", inputFile);
+  mysql_query(con, stmt);
+  if (MysqlErrorCheck() == 1)
+    return 1;
+  TimeStamp(time_start);
 /*
   sprintf(stmt, "INSERT INTO tempRunList SELECT DISTINCT runID FROM %s.Spill;", inputFile);
   mysql_query(con, stmt);
@@ -336,7 +342,7 @@ int main(int argc, char **argv)
     return 1;
   TimeStamp(time_start);
   
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
+  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;");
   mysql_query(con, stmt);
   if (MysqlErrorCheck() == 1)
     return 1;
@@ -353,7 +359,7 @@ int main(int argc, char **argv)
     return 1;
     TimeStamp(time_start);
 
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
+  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;");
     mysql_query(con, stmt);
       if (MysqlErrorCheck() == 1)
         return 1;
@@ -370,7 +376,7 @@ int main(int argc, char **argv)
     return 1;
     TimeStamp(time_start);
 
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
+  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;");
     mysql_query(con, stmt);
       if (MysqlErrorCheck() == 1)
         return 1;
@@ -395,7 +401,7 @@ int main(int argc, char **argv)
     return 1;
     TimeStamp(time_start);
 
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
+  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;");
     mysql_query(con, stmt);
       if (MysqlErrorCheck() == 1)
         return 1;
@@ -412,7 +418,7 @@ int main(int argc, char **argv)
     return 1;
     TimeStamp(time_start);
 
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
+  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;");
     mysql_query(con, stmt);
       if (MysqlErrorCheck() == 1)
         return 1;
@@ -448,7 +454,7 @@ int main(int argc, char **argv)
     return 1;
     TimeStamp(time_start);
 
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
+  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;");
     mysql_query(con, stmt);
       if (MysqlErrorCheck() == 1)
         return 1;
@@ -719,6 +725,28 @@ int main(int argc, char **argv)
     row = mysql_fetch_row(res);
     cout << row[0] << " dimuons after kDimuon cuts" <<endl;
 
+    //get the chamber, trigger intensities
+    sprintf(stmt, "ALTER TABLE kDimuon ADD COLUMN Intensity_p DOUBLE;");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+    
+    sprintf(stmt, "UPDATE kDimuon SET Intensity_p = 0;");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+    
+    sprintf(stmt, "UPDATE kDimuon, QIE SET kDimuon.Intensity_p=QIE.Intensity_p "
+            "WHERE QIE.spillID = kDimuon.spillID AND QIE.eventID = kDimuon.eventID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+    
+    //don't need for the moment
+    /*
     //need to add kTrack momentums here
     sprintf(stmt, "ALTER TABLE kDimuon ADD COLUMN posx1 DOUBLE, "
             "ADD COLUMN posy1 DOUBLE, "
@@ -856,7 +884,10 @@ int main(int argc, char **argv)
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
+    */
 
+
+    
     sprintf(stmt, "OPTIMIZE TABLES kDimuon, kTrack;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
@@ -866,7 +897,7 @@ int main(int argc, char **argv)
 
     //ok, cleanup
     TimeStamp(time_start);
-    sprintf(stmt, "DROP TABLE IF EXISTS Event, Target, Scaler;");
+    sprintf(stmt, "DROP TABLE IF EXISTS Event, Target, Scaler, QIE;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
