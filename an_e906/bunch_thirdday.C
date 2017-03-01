@@ -107,7 +107,7 @@ void bunch_thirdday(const int Trig = 1, const int Roadset = 67, const int NBins 
 */
       sprintf(Hname, "anval1_target%d_xf%d", a, k);
       sprintf(Tname, "A_{N} 8 hour Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
-      sprintf(Tname, "A_{N} for #LT18 hour#GT spin change", Roadset, xfTitleMin, xfTitleMax, inArm);
+      sprintf(Tname, "A_{N} for #LT8 hour#GT spin change", Roadset, xfTitleMin, xfTitleMax, inArm);
       anval1[a][k] = new TH1F(Hname, Tname, 200, -.1, .1);
       anval1[a][k] -> GetYaxis() -> SetTitle ("Counts");
       anval1[a][k] -> GetXaxis() -> SetTitle ("A_{N}");

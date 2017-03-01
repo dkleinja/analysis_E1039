@@ -1,7 +1,7 @@
 #include <asym_funcs.C>
 #include <fit_funcs.C>
 
-void bunch_day(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
+void bunch_day(const int Trig = 1, const int Roadset = 67, const int NBins = 1)
 {
 
   //general business
@@ -99,11 +99,6 @@ void bunch_day(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
       sprintf(Hname, "gausdist_target%d_xf%d", a, k);
       gausdist5[a][k] = new TF1(Hname, "gaus", -2, 2);
 
-      sprintf(Hname, "anval5_target%d_xf%d", a, k);
-      sprintf(Tname, "Sqrt A_{N} #chi^{2}/NDF for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
-      anval5[a][k] = new TH1F(Hname, Hname, 200, -.1, .1);
-      anval5[a][k] -> GetXaxis() -> SetTitle ("Counts");
-      anval5[a][k] -> GetYaxis() -> SetTitle ("A_{N}");
 
       sprintf(Hname, "anval1_target%d_xf%d", a, k);
       sprintf(Tname, "A_{N} 1 Day Shuff. for Roadset %d, %1.1f < x_{F} < %1.1f for %s", Roadset, xfTitleMin, xfTitleMax, inArm);
@@ -136,7 +131,7 @@ void bunch_day(const int Trig = 0, const int Roadset = 67, const int NBins = 1)
   }
 
   //inFiles
-  const int NFILES = 5000;
+  const int NFILES = 15000;
   int ifile;
   TFile *inFile[NFILES];
   

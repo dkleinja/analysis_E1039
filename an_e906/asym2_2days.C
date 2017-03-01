@@ -456,6 +456,7 @@ void asym2_2days(const int Trig = 0, const int NBins = 1, const int Roadset = 67
   YieldTree -> SetBranchAddress ("mass",            &mass);
   YieldTree -> SetBranchAddress ("xF",              &xF);
   //YieldTree -> SetBranchAddress ("xB",              &xB);
+  YieldTree -> SetBranchAddress ("xT",              &xT);
   //YieldTree -> SetBranchAddress ("costh",              &costh);
   //YieldTree -> SetBranchAddress ("phi",              &phi);
   //YieldTree -> SetBranchAddress ("trackSeparation", &trackSeparation);
@@ -1173,7 +1174,7 @@ void asym2_2days(const int Trig = 0, const int NBins = 1, const int Roadset = 67
   cout << "The mean of pseudo-rapidity is " << meaneta << endl;
   */
   //Write out to OutFile!!
-  char *outNameText = "./results/asym2_roadset%d_nbins%d_2days%d.root";
+  char *outNameText = "./results_tighter/asym2_roadset%d_nbins%d_2days%d.root";
   sprintf (outName, outNameText, Roadset, nbins, Seed);
 
   TFile *outFile = new TFile (outName, "RECREATE");

@@ -456,6 +456,7 @@ void asym2_halfday(const int Trig = 0, const int NBins = 5, const int Roadset = 
   YieldTree -> SetBranchAddress ("mass",            &mass);
   YieldTree -> SetBranchAddress ("xF",              &xF);
   //YieldTree -> SetBranchAddress ("xB",              &xB);
+  YieldTree -> SetBranchAddress ("xT",              &xT);
   //YieldTree -> SetBranchAddress ("costh",              &costh);
   //YieldTree -> SetBranchAddress ("phi",              &phi);
   //YieldTree -> SetBranchAddress ("trackSeparation", &trackSeparation);
