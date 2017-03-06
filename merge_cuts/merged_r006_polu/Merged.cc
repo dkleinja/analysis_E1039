@@ -739,7 +739,7 @@ int main(int argc, char **argv)
 
     //ok, cleanup
     TimeStamp(time_start);
-    sprintf(stmt, "DROP TABLE IF EXISTS Event;");
+    sprintf(stmt, "DROP TABLE IF EXISTS Event, QIE;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
