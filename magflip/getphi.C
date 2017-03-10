@@ -1,4 +1,4 @@
-void getphi(const int ktrackon = 0, const int roadset = 61)
+void getphi(const int ktrackon = 0, const int roadset = 61, const int prod = 6)
 {
 
   gStyle -> SetOptFit(1);
@@ -8,11 +8,13 @@ void getphi(const int ktrackon = 0, const int roadset = 61)
   char Hname[128];
   char Tname[128];
 
-  sprintf(Tname, "#phi of dimuon, roadset %d", roadset);
+  sprintf(Tname, "#phi of dimuon, roadset%d_R00%d", roadset, prod);
   TH1D *Hdmphi = new TH1D("Hdmphi", Tname, 64, -3.15, 3.15);
-  sprintf(Tname, "#phi of #mu^{-}, roadset %d", roadset);
+  sprintf(Tname, "CS #phi of dimuon, roadset%d_R00%d", roadset, prod);
+  TH1D *Hdmcsphi = new TH1D("Hcsphi", Tname, 64, -3.15, 3.15);
+  sprintf(Tname, "#phi of #mu^{-}, roadset%d_R00%d", roadset, prod);
   TH1D *Hmmuonphi = new TH1D("Hmmuonphi", Tname, 64, -3.15, 3.15);
-  sprintf(Tname, "#phi of #mu^{+}, roadset %d", roadset);
+  sprintf(Tname, "#phi of #mu^{+}, roadset%d_R00%d", roadset, prod);
   TH1D *Hpmuonphi = new TH1D("Hpmuonphi", Tname, 64, -3.15, 3.15);
   Hdmphi -> SetXTitle("#phi");
   Hdmphi -> SetYTitle("Counts");
@@ -22,6 +24,7 @@ void getphi(const int ktrackon = 0, const int roadset = 61)
   Hpmuonphi -> SetYTitle("Counts");
 
   Hdmphi -> Sumw2();
+  Hdmcsphi -> Sumw2();
   Hmmuonphi -> Sumw2();
   Hpmuonphi -> Sumw2();
 
@@ -30,7 +33,7 @@ void getphi(const int ktrackon = 0, const int roadset = 61)
   Hcharge -> SetXTitle("Charge");
   Hcharge -> SetYTitle("Counts");
 
-  sprintf(Fname, "./nDST/Analysis_roadset%d_R005_V001.root", roadset);
+  sprintf(Fname, "./nDST/Analysis_roadset%d_R00%d_V001.root", roadset, prod);
   TFile *inFile = new TFile(Fname);
   TTree *dmtree = (TTree*) inFile -> Get("kdimuon");
 
@@ -38,7 +41,7 @@ void getphi(const int ktrackon = 0, const int roadset = 61)
   TFile *inFile1 = new TFile(Fname);
   TTree *tracktree = (TTree*) inFile1 -> Get("ktrack");
 
-  sprintf(Fname, "./nDST/Analysis_roadset%d_R005_V001_spill.root", roadset);
+  sprintf(Fname, "./nDST/cuts1489v1/Analysis_roadset%d_R005_V001_spill.root", roadset);
   TFile *inFile2 = new TFile(Fname);
   TTree *spilltree = (TTree*) inFile2 -> Get("spill");
 
@@ -59,6 +62,7 @@ void getphi(const int ktrackon = 0, const int roadset = 61)
   Float_t m2hm, m2hs, m2vm, m2vs;
   Float_t dhm, dvm;
   Float_t phi;
+  Float_t csphi;
 
   dmtree -> SetBranchAddress ("dimuonID",        &dimuonID);
   dmtree -> SetBranchAddress ("runID",           &runID);
@@ -157,6 +161,8 @@ void getphi(const int ktrackon = 0, const int roadset = 61)
   printf(Tname);
   //get phi distributions dimuon
   TLorentzVector *lordm = new TLorentzVector;
+  TLorentzVector *track1 = new TLorentzVector;
+  TLorentzVector *track2 = new TLorentzVector;
   int nentries = dmtree -> GetEntries();
   cout << "The number of dimuon Entries is " << nentries << endl;
   int zbin;
@@ -165,9 +171,16 @@ void getphi(const int ktrackon = 0, const int roadset = 61)
     dmtree -> GetEntry(i);
 
     if(target == 0 || dump == 1) continue;
+    if(targetPos != 3) continue;
     lordm -> SetXYZM(dpx, dpy, dpz, mass);
+    track1 -> SetXYZM(px1, py1, pz1, 0.105658);
+    track2 -> SetXYZM(px2, py2, pz2, 0.105658);
+    dpt = lordm -> Pt();
+    csphi = TMath::ATan2(2.*TMath::Sqrt(mass*mass + dpt*dpt)*(px1*py2 - px2*py1), mass*(px2*px2 - px1*px1 + py2*py2 -py1*py1));
+    if(prod==6)csphi = TMath::ATan2(2.*TMath::Sqrt(mass*mass + dpt*dpt)*(px2*py1 - px1*py2), mass*(px1*px1 - px2*px2 + py1*py1 -py2*py2));
     phi = lordm -> Phi();
     Hdmphi -> Fill(phi);
+    Hdmcsphi -> Fill(csphi);
   } 
 
   //get phi distributions ktrack
@@ -180,7 +193,7 @@ void getphi(const int ktrackon = 0, const int roadset = 61)
       tracktree -> GetEntry(i);
 
       if(target == 0 || dump == 1) continue;
-
+      if(targetPos != 3) continue;
       lordm -> SetXYZM(px1, py1, pz1, 0.105);
       phi = lordm -> Phi();
 
@@ -196,21 +209,24 @@ void getphi(const int ktrackon = 0, const int roadset = 61)
     } 
   }
 
-  TCanvas *c3 = new TCanvas("c3", "c3", 1800, 400);
-  c3 -> Divide(3, 1);
+  TCanvas *c3 = new TCanvas("c3", "c3", 1800, 800);
+  c3 -> Divide(2, 2);
   c3 -> cd(1);
   Hdmphi -> Draw();
   c3 -> cd(2);
-  Hmmuonphi -> Draw();
+  Hdmcsphi -> Draw();
   c3 -> cd(3);
+  Hmmuonphi -> Draw();
+  c3 -> cd(4);
   Hpmuonphi -> Draw();
-  sprintf(Hname, "./images/phidists_roadset%d.gif", roadset);
+  sprintf(Hname, "./images/phidists_roadset%d_prod%d.gif", roadset, prod);
   c3 -> SaveAs(Hname);
 
-  sprintf(Fname, "./root_files/phidists_roadset%d.root", roadset);
+  sprintf(Fname, "./root_files/phidists_roadset%d_prod%d.root", roadset, prod);
   TFile *outfile = new TFile(Fname, "RECREATE");
   outfile -> cd();
   Hdmphi -> Write();
+  Hdmcsphi -> Write();
   Hmmuonphi -> Write();
   Hpmuonphi -> Write();
   Hcharge -> Write();

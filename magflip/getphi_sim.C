@@ -70,9 +70,12 @@ void getphi_sim(const int ktrackon = 0, const int tarvar = 0, const int magflip 
   Hcharge -> SetXTitle("Charge");
   Hcharge -> SetYTitle("Counts");
 
-  sprintf(Fname, "./nDST/Analysis_mc_drellyan_%s_M0%d_S0%02d.root", tardump, mvar, svar);
-  printf(Fname, "./nDST/Analysis_mc_drellyan_%s_M0%d_S0%02d.root ", tardump, mvar, svar);
+  //sprintf(Fname, "./nDST/Analysis_mc_drellyan_%s_M0%d_S0%02d.root", tardump, mvar, svar);
+  //printf(Fname, "./nDST/Analysis_mc_drellyan_%s_M0%d_S0%02d.root ", tardump, mvar, svar);
 
+  sprintf(Fname, "./nDST/test_dkleinja_mc_drellyan_%s_M0%d_S0%02d.root", tardump, mvar, svar);
+  printf(Fname, "./nDST/test_dkleinja_mc_drellyan_%s_M0%d_S0%02d.root ", tardump, mvar, svar);
+  
   TFile *inFile = new TFile(Fname);
   TTree *dmtree = (TTree*) inFile -> Get("kdimuon");
 
@@ -96,6 +99,7 @@ void getphi_sim(const int ktrackon = 0, const int tarvar = 0, const int magflip 
   Float_t px1, py1, pz1;
   Float_t px2, py2, pz2;
   Float_t trackSeparation, chisq_dimuon;
+  Float_t sigWeight;
   Int_t target, dump;
   Int_t targetPos;
   Float_t m3hm, m3hs, m3vm, m3vs;
@@ -131,6 +135,7 @@ void getphi_sim(const int ktrackon = 0, const int tarvar = 0, const int magflip 
   dmtree -> SetBranchAddress ("px2",             &px2);
   dmtree -> SetBranchAddress ("py2",             &py2);
   dmtree -> SetBranchAddress ("pz2",             &pz2);
+  dmtree -> SetBranchAddress ("sigWeight",             &sigWeight);
   dmtree -> SetBranchAddress ("target",          &target);
   dmtree -> SetBranchAddress ("dump",            &dump);
   dmtree -> SetBranchAddress ("targetPos",       &targetPos);
@@ -247,17 +252,17 @@ void getphi_sim(const int ktrackon = 0, const int tarvar = 0, const int magflip 
     if(lordm -> Pt() < 1.)continue;
 
     phi = lordm -> Phi();
-    Hdmphi -> Fill(phi);
+    Hdmphi -> Fill(phi, sigWeight);
     phi = track1 -> Phi();
-    Hpmuonphi -> Fill(phi);
+    Hpmuonphi -> Fill(phi, sigWeight);
     phi = track2 -> Phi();
-    Hmmuonphi -> Fill(phi);
+    Hmmuonphi -> Fill(phi, sigWeight);
     eta = lordm -> Eta();
-    Hdmeta -> Fill(eta);
+    Hdmeta -> Fill(eta, sigWeight);
     eta = track1 -> Eta();
-    Hpmuoneta -> Fill(eta);
+    Hpmuoneta -> Fill(eta, sigWeight);
     eta = track2 -> Eta();
-    Hmmuoneta -> Fill(eta);
+    Hmmuoneta -> Fill(eta, sigWeight);
   } 
 
   //get phi distributions ktrack
@@ -288,11 +293,11 @@ void getphi_sim(const int ktrackon = 0, const int tarvar = 0, const int magflip 
 
       //in roadset62 careful with charge variable when magnet flipped
       if(charge == -1){
-	Hmmuonphi -> Fill(phi);
+	Hmmuonphi -> Fill(phi, sigWeight);
 	Hcharge -> Fill(charge);
       } 
       else if(charge == 1){
-	Hpmuonphi -> Fill(phi);
+	Hpmuonphi -> Fill(phi, sigWeight);
 	Hcharge -> Fill(charge);
       }
     } 
