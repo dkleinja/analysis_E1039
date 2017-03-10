@@ -1,4 +1,4 @@
-void hodoeff_calc(const int reco = 5, const int ntracks = 1, const int momcut = 20, const int ycut = 3, const int centcut = 90)
+void hodoeff_calc(const int reco = 5, const int roadset = 57, const int ntracks = 1, const int momcut = 20, const int ycut = 3, const int centcut = 90)
 {
   gStyle->SetOptStat(0);
   int hodoID;
@@ -11,7 +11,7 @@ void hodoeff_calc(const int reco = 5, const int ntracks = 1, const int momcut = 
   //get the values
   Int_t paddleNumber;
   Double_t x;
-  Double_t Efficiency;
+  Double_t Efficiency, Efficiency_low, Efficiency_high;
   Double_t EffError_low, EffError_high;
   
   /* 
@@ -33,7 +33,10 @@ void hodoeff_calc(const int reco = 5, const int ntracks = 1, const int momcut = 
   int chainfirst = 12525;
   //int chainlast = 12526;
   int chainlast = 15789;
-
+  if(roadset==57){
+    chainfirst = 8412;
+    chainlast = 10415;
+  }
   //for(int i = chainfirst; i <= chainlast; i++){
   for(int i = chainfirst; i <= chainlast; i++){
     //if(i > 13799 && i < 14800)continue;
@@ -119,7 +122,7 @@ void hodoeff_calc(const int reco = 5, const int ntracks = 1, const int momcut = 
   //let's create ofstream file
   ofstream outFile;
   sprintf(Fname, "./eff/roadset67_R00%d_ntracks%d_momcut%d_ycut%d_centcut90.txt", reco, ntracks, momcut, ycut);
-  //sprintf(Fname, "detectorEff.txt", reco, ntracks, momcut, ycut);
+  //sprintf(Fname, "detectorEff_low.txt", reco, ntracks, momcut, ycut);
   outFile.open(Fname);
   outFile << "HodoName" << "\t" << "elementID" << "\t" << "Efficiency" << "\t" << "Error_low" << "\t" << "Error_high" << "\n";
   for(int i = 0; i < 8; ++i)
@@ -136,8 +139,12 @@ void hodoeff_calc(const int reco = 5, const int ntracks = 1, const int momcut = 
 	paddleNumber = x;
 	EffError_low = graph_eff[i] -> GetErrorYlow(j);
 	EffError_high = graph_eff[i] -> GetErrorYhigh(j);
+	Efficiency_low = Efficiency - EffError_low;
+	Efficiency_high = Efficiency + EffError_high;
 	outFile << hodoNames[i] << "\t" << paddleNumber << "\t" << Efficiency << "\t" << EffError_low << "\t" << EffError_high << "\n";
 	//outFile << hodoNames[i] << "\t" << paddleNumber << "\t" << Efficiency << "\t" << 0 << "\n";
+	//outFile << hodoNames[i] << "\t" << paddleNumber << "\t" << Efficiency_low << "\t" << 0 << "\n";
+	//outFile << hodoNames[i] << "\t" << paddleNumber << "\t" << Efficiency_high << "\t" << 0 << "\n";
 	printf("%s : %4i : %1.4f : %1.4f : %1.4f \n", hodoNames[i].c_str(), paddleNumber, Efficiency, EffError_low, EffError_high);
       }
     }
@@ -177,9 +184,9 @@ void hodoeff_calc(const int reco = 5, const int ntracks = 1, const int momcut = 
     }
 
   c1 -> cd();
-  sprintf(Fname, "./images/roadset67_R00%d_ntracks%d_momcut%d_ycut%d_centcut90.gif", reco, ntracks, momcut, ycut);
+  sprintf(Fname, "./images/roadset%d_R00%d_ntracks%d_momcut%d_ycut%d_centcut90.gif", roadset, reco, ntracks, momcut, ycut);
   c1 -> SaveAs(Fname);
   c2 -> cd();
-  sprintf(Fname, "./images/roadset67_yields_R00%d_ntracks%d_momcut%d_ycut%d_centcut90.gif", reco, ntracks, momcut, ycut);
+  sprintf(Fname, "./images/roadset%d_yields_R00%d_ntracks%d_momcut%d_ycut%d_centcut90.gif", roadset, reco, ntracks, momcut, ycut);
   c2 -> SaveAs(Fname);
 }

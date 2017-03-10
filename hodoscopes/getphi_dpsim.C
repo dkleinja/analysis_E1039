@@ -83,7 +83,7 @@ void getphi_dpsim(int hodoeff = 0, int trigon = 1, int seed = 0)
 	  track1.SetPxPyPzE(dimuon.fPosMomentum.Px(), dimuon.fPosMomentum.Py(), dimuon.fPosMomentum.Pz(), dimuon.fPosMomentum.E());
 	  track2.SetPxPyPzE(dimuon.fNegMomentum.Px(), dimuon.fNegMomentum.Py(), dimuon.fNegMomentum.Pz(), dimuon.fNegMomentum.E());
 	  lordm = track1 + track2;
-	  if(lordm.Pt() < 1.)continue;
+	  if(lordm.Pt() < 0.5)continue;
 	  phi = lordm.Phi();
 	  double weight = rawEvent->eventHeader().fSigWeight;
 	  Hdmphi -> Fill(phi, weight);
