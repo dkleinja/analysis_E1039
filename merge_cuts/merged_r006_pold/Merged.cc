@@ -108,8 +108,8 @@ int main(int argc, char **argv)
       return 1;
     TimeStamp(time_start);
 
-  sprintf(stmt, "DROP TABLE IF EXISTS Run, TriggerRoads, Spill, Event, tempRunList, "
-                "QIE, BeamDAQ, Beam, Target, Scaler, tempSpillList, tempEventList, dimuonsAfterTrackCuts;");
+  sprintf(stmt, "DROP TABLE IF EXISTS Run, TriggerRoads, Spill, Event, QIE, tempRunList, "
+                "tempSpillList, tempEventList, dimuonsAfterTrackCuts;");
   mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
@@ -158,7 +158,7 @@ int main(int argc, char **argv)
       return 1;
     TimeStamp(time_start);
 
-    sprintf(stmt, "DELETE FROM kDimuon;", inputFile);
+    sprintf(stmt, "DELETE FROM kDimuon;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
@@ -194,7 +194,7 @@ int main(int argc, char **argv)
       return 1;
     TimeStamp(time_start);
 
-    sprintf(stmt, "DELETE FROM kTrack;", inputFile);
+    sprintf(stmt, "DELETE FROM kTrack;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
@@ -233,35 +233,17 @@ int main(int argc, char **argv)
     return 1;
     TimeStamp(time_start);
 
-  sprintf(stmt, "CREATE TABLE BeamDAQ LIKE %s.BeamDAQ;", inputFile);
-  mysql_query(con, stmt);
-  if (MysqlErrorCheck() == 1)
-    return 1;
-    TimeStamp(time_start);
-
-  sprintf(stmt, "CREATE TABLE Beam LIKE %s.Beam;", inputFile);
-  mysql_query(con, stmt);
-  if (MysqlErrorCheck() == 1)
-    return 1;
-    TimeStamp(time_start);
-
   sprintf(stmt, "CREATE TABLE IF NOT EXISTS Event LIKE %s.Event;", inputFile);
   mysql_query(con, stmt);
   if (MysqlErrorCheck() == 1)
     return 1;
     TimeStamp(time_start);
 
-  sprintf(stmt, "CREATE TABLE IF NOT EXISTS Target LIKE %s.Target;", inputFile);
+  sprintf(stmt, "CREATE TABLE IF NOT EXISTS QIE LIKE %s.QIE;", inputFile);
   mysql_query(con, stmt);
   if (MysqlErrorCheck() == 1)
     return 1;
-    TimeStamp(time_start);
-
-  sprintf(stmt, "CREATE TABLE IF NOT EXISTS Scaler LIKE %s.Scaler;", inputFile);
-  mysql_query(con, stmt);
-  if (MysqlErrorCheck() == 1)
-    return 1;
-    TimeStamp(time_start);
+  TimeStamp(time_start);
 /*
   sprintf(stmt, "INSERT INTO tempRunList SELECT DISTINCT runID FROM %s.Spill;", inputFile);
   mysql_query(con, stmt);
@@ -273,7 +255,6 @@ int main(int argc, char **argv)
   if (MysqlErrorCheck() == 1)
     return 1;
 */
-
 
   sprintf(stmt, "INSERT INTO tempRunList SELECT DISTINCT run FROM %s.production WHERE ktracked = 1;", inputFile);
   mysql_query(con, stmt);
@@ -292,13 +273,7 @@ int main(int argc, char **argv)
     cout << row[0] << " spills before spill cuts" <<endl;
 
   sprintf(stmt, "INSERT INTO tempSpillList SELECT Spill.spillID FROM %s.Spill "
-                "JOIN %s.Beam AS b1 ON b1.spillID = Spill.spillID AND b1.name = 'S:G2SEM' "
-                "JOIN %s.Beam AS b2 ON b2.spillID = Spill.spillID AND b2.name = 'F:NM3ION' "
-                "JOIN %s.BeamDAQ ON Spill.spillID = BeamDAQ.spillID "
                 "JOIN %s.Target ON Target.spillID = Spill.spillID AND Target.name = 'TARGPOS_CONTROL' "
-                "JOIN %s.Scaler AS s1 ON s1.spillID = Spill.spillID AND s1.scalerName = 'TSgo' AND s1.spillType = 'EOS' "
-                "JOIN %s.Scaler AS s2 ON s2.spillID = Spill.spillID AND s2.scalerName = 'AcceptedMatrix1' AND s2.spillType = 'EOS' "
-                "JOIN %s.Scaler AS s3 ON s3.spillID = Spill.spillID AND s3.scalerName = 'AfterInhMatrix1' AND s3.spillType = 'EOS' "
                 "JOIN tempRunList ON tempRunList.runID = Spill.runID "
                 "WHERE Spill.dataQuality = 0 "
                 //"AND Spill.status = 0 "
@@ -336,7 +311,7 @@ int main(int argc, char **argv)
     return 1;
   TimeStamp(time_start);
   
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
+  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;");
   mysql_query(con, stmt);
   if (MysqlErrorCheck() == 1)
     return 1;
@@ -353,7 +328,7 @@ int main(int argc, char **argv)
     return 1;
     TimeStamp(time_start);
 
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
+  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;");
     mysql_query(con, stmt);
       if (MysqlErrorCheck() == 1)
         return 1;
@@ -361,101 +336,6 @@ int main(int argc, char **argv)
     res = mysql_store_result(con);
     row = mysql_fetch_row(res);
     cout << row[0] << " spills after Spill cuts" <<endl;
-
-  sprintf(stmt, "DELETE FROM tempSpillList USING tempSpillList JOIN "
-                "(SELECT spillID FROM %s.BeamDAQ GROUP BY spillID HAVING COUNT(1) != 1) AS t1 "
-                "ON t1.spillID = tempSpillList.spillID;", inputFile);
-  mysql_query(con, stmt);
-  if (MysqlErrorCheck() == 1)
-    return 1;
-    TimeStamp(time_start);
-
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
-    mysql_query(con, stmt);
-      if (MysqlErrorCheck() == 1)
-        return 1;
-    TimeStamp(time_start);
-    res = mysql_store_result(con);
-    row = mysql_fetch_row(res);
-    cout << row[0] << " spills after BeamDAQ cuts" <<endl;
-
-  sprintf(stmt, "DELETE FROM tempSpillList USING tempSpillList JOIN "
-                "(SELECT spillID FROM %s.Beam WHERE name = 'S:G2SEM' GROUP BY spillID HAVING COUNT(1) != 1) AS t1 "
-                "ON t1.spillID = tempSpillList.spillID;", inputFile);
-  mysql_query(con, stmt);
-  if (MysqlErrorCheck() == 1)
-    return 1;
-    TimeStamp(time_start);
-
-  sprintf(stmt, "DELETE FROM tempSpillList USING tempSpillList JOIN "
-                "(SELECT spillID FROM %s.Beam WHERE name = 'F:NM3ION' GROUP BY spillID HAVING COUNT(1) != 1) AS t1 "
-                "ON t1.spillID = tempSpillList.spillID;", inputFile);
-  mysql_query(con, stmt);
-  if (MysqlErrorCheck() == 1)
-    return 1;
-    TimeStamp(time_start);
-
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
-    mysql_query(con, stmt);
-      if (MysqlErrorCheck() == 1)
-        return 1;
-    TimeStamp(time_start);
-    res = mysql_store_result(con);
-    row = mysql_fetch_row(res);
-    cout << row[0] << " spills after Beam cuts" <<endl;
-
-  sprintf(stmt, "DELETE FROM tempSpillList USING tempSpillList JOIN "
-                "(SELECT spillID FROM %s.Target WHERE name = 'TARGPOS_CONTROL' GROUP BY spillID HAVING COUNT(1) != 1) AS t1 "
-                "ON t1.spillID = tempSpillList.spillID;", inputFile);
-  mysql_query(con, stmt);
-  if (MysqlErrorCheck() == 1)
-    return 1;
-    TimeStamp(time_start);
-
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
-    mysql_query(con, stmt);
-      if (MysqlErrorCheck() == 1)
-        return 1;
-    TimeStamp(time_start);
-    res = mysql_store_result(con);
-    row = mysql_fetch_row(res);
-    cout << row[0] << " spills after Target cuts" <<endl;
-
-  sprintf(stmt, "DELETE FROM tempSpillList USING tempSpillList JOIN "
-                "(SELECT spillID FROM %s.Scaler WHERE scalerName = 'AcceptedMATRIX1' AND spillType = 'EOS' "
-                "GROUP BY spillID HAVING COUNT(1) != 1) AS t1 "
-                "ON t1.spillID = tempSpillList.spillID;", inputFile); 
-  mysql_query(con, stmt);
-  if (MysqlErrorCheck() == 1)
-    return 1;
-    TimeStamp(time_start);
-
-  sprintf(stmt, "DELETE FROM tempSpillList USING tempSpillList JOIN "
-                "(SELECT spillID FROM %s.Scaler WHERE scalerName = 'AfterInhMATRIX1' AND spillType = 'EOS' "
-                "GROUP BY spillID HAVING COUNT(1) != 1) AS t1 "
-                "ON t1.spillID = tempSpillList.spillID;", inputFile);
-  mysql_query(con, stmt);
-  if (MysqlErrorCheck() == 1)
-    return 1;
-    TimeStamp(time_start);
-
-  sprintf(stmt, "DELETE FROM tempSpillList USING tempSpillList JOIN "
-                "(SELECT spillID FROM %s.Scaler WHERE scalerName = 'TSgo' AND spillType = 'EOS' "
-                "GROUP BY spillID HAVING COUNT(1) != 1) AS t1 "
-                "ON t1.spillID = tempSpillList.spillID;", inputFile);
-  mysql_query(con, stmt);
-  if (MysqlErrorCheck() == 1)
-    return 1;
-    TimeStamp(time_start);
-
-  sprintf(stmt, "SELECT COUNT(1) FROM tempSpillList;", inputFile);
-    mysql_query(con, stmt);
-      if (MysqlErrorCheck() == 1)
-        return 1;
-    TimeStamp(time_start);
-    res = mysql_store_result(con);
-    row = mysql_fetch_row(res);
-    cout << row[0] << " spills after Scaler cuts" <<endl;
 
   sprintf(stmt, "CREATE INDEX spillID ON tempSpillList(spillID);");
   mysql_query(con, stmt);
@@ -484,41 +364,21 @@ int main(int argc, char **argv)
     return 1;
     TimeStamp(time_start);
 
-  sprintf(stmt, "INSERT INTO BeamDAQ SELECT BeamDAQ.* FROM %s.BeamDAQ JOIN "
-                "tempSpillList ON tempSpillList.spillID = BeamDAQ.spillID;", inputFile);
-  mysql_query(con, stmt);
-  if (MysqlErrorCheck() == 1)
-    return 1;
-    TimeStamp(time_start);
-
-  sprintf(stmt, "INSERT INTO Beam SELECT Beam.* FROM %s.Beam JOIN "
-                "tempSpillList ON tempSpillList.spillID = Beam.spillID;", inputFile);
-  mysql_query(con, stmt);
-  if (MysqlErrorCheck() == 1)
-    return 1;
-    TimeStamp(time_start);
-
   sprintf(stmt, "INSERT INTO Event SELECT Event.* FROM %s.Event JOIN "
                 "tempSpillList ON tempSpillList.spillID = Event.spillID;",
                 inputFile);
   mysql_query(con, stmt);
   if (MysqlErrorCheck() == 1)
     return 1;
-    TimeStamp(time_start);
+  TimeStamp(time_start);
 
-  sprintf(stmt, "INSERT INTO Target SELECT Target.* FROM %s.Target JOIN "
-                "tempSpillList ON tempSpillList.spillID = Target.spillID;", inputFile);
+  //sprintf(stmt, "INSERT INTO QIE SELECT QIE.* FROM %s.QIE ", inputFile);
+  sprintf(stmt, "INSERT INTO QIE SELECT QIE.* FROM %s.QIE JOIN "
+                  "tempSpillList ON tempSpillList.spillID = QIE.spillID;", inputFile);
   mysql_query(con, stmt);
   if (MysqlErrorCheck() == 1)
     return 1;
-    TimeStamp(time_start);
-
-  sprintf(stmt, "INSERT INTO Scaler SELECT Scaler.* FROM %s.Scaler JOIN "
-                "tempSpillList ON tempSpillList.spillID = Scaler.spillID;", inputFile);
-  mysql_query(con, stmt);
-  if (MysqlErrorCheck() == 1)
-    return 1;
-    TimeStamp(time_start);
+  TimeStamp(time_start);
 
   if (kDim)
   {
@@ -567,7 +427,7 @@ int main(int argc, char **argv)
       return 1;
 */
 
-  sprintf(stmt, "OPTIMIZE TABLES Spill, Event, Beam, BeamDAQ, Target, Scaler;");
+  sprintf(stmt, "OPTIMIZE TABLES Spill, Event, QIE;");
   mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;
@@ -718,6 +578,29 @@ int main(int argc, char **argv)
     row = mysql_fetch_row(res);
     cout << row[0] << " dimuons after kDimuon cuts" <<endl;
 
+    //get the chamber, trigger intensities
+    sprintf(stmt, "ALTER TABLE kDimuon ADD COLUMN Intensity_p DOUBLE");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+    
+    sprintf(stmt, "UPDATE kDimuon SET Intensity_p = 0");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+    
+    sprintf(stmt, "UPDATE kDimuon, QIE SET kDimuon.Intensity_p=QIE.Intensity_p "
+    //sprintf(stmt, "UPDATE kDimuon, QIE SET kDimuon.Intensity_p=QIE.`RF+00` "	    
+            "WHERE kDimuon.spillID = QIE.spillID AND kDimuon.eventID = QIE.eventID");
+    mysql_query(con, stmt);
+    if (MysqlErrorCheck() == 1)
+      return 1;
+    TimeStamp(time_start);
+    
+    //don't need for the moment
+    /*
     //need to add kTrack momentums here
     sprintf(stmt, "ALTER TABLE kDimuon ADD COLUMN posx1 DOUBLE, "
             "ADD COLUMN posy1 DOUBLE, "
@@ -842,20 +725,10 @@ int main(int argc, char **argv)
     if (MysqlErrorCheck() == 1)
       return 1;
     TimeStamp(time_start);
+    */
 
-    sprintf(stmt, "ALTER TABLE Spill ADD COLUMN liveProton2 BIGINT;");
-    mysql_query(con, stmt);
-    if (MysqlErrorCheck() == 1)
-      return 1;
-    TimeStamp(time_start);
 
-    sprintf(stmt, "UPDATE Spill, Beam, BeamDAQ SET Spill.liveProton2 = Beam.value * (BeamDAQ.QIEsum - BeamDAQ.inhibit_block_sum - BeamDAQ.trigger_sum_no_inhibit) / BeamDAQ.QIEsum "
-            "WHERE Spill.spillID = Beam.spillID AND Spill.spillID = BeamDAQ.spillID AND Beam.name = 'S:G2SEM'");
-    mysql_query(con, stmt);
-    if (MysqlErrorCheck() == 1)
-      return 1;
-    TimeStamp(time_start);
-
+    
     sprintf(stmt, "OPTIMIZE TABLES kDimuon, kTrack;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
@@ -865,7 +738,7 @@ int main(int argc, char **argv)
 
     //ok, cleanup
     TimeStamp(time_start);
-    sprintf(stmt, "DROP TABLE IF EXISTS Event, Target, Scaler;");
+    sprintf(stmt, "DROP TABLE IF EXISTS Event, QIE;");
     mysql_query(con, stmt);
     if (MysqlErrorCheck() == 1)
       return 1;

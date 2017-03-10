@@ -462,7 +462,6 @@ int main(int argc, char **argv)
                   "LEFT JOIN kTrack AS t1 ON t1.spillID = kDimuon.spillID AND t1.trackID = kDimuon.posTrackID "
                   "LEFT JOIN kTrack AS t2 ON t2.spillID = kDimuon.spillID AND t2.trackID = kDimuon.negTrackID "
                   "WHERE (t1.roadID * t2.roadID > 0) OR "
-                  //"WHERE t1.trackID IS NULL OR "
                   "t1.trackID IS NULL OR "
                   "t2.trackID IS NULL;");
     mysql_query(con, stmt);
