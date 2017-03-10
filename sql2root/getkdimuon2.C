@@ -22,8 +22,8 @@ void getkdimuon2(const char *schema, const int val = 0)
    //exit(1);
 
   //connect to server
-  //TSQLServer *con = TSQLServer::Connect("mysql://seaquel.physics.illinois.edu:3283", "seaguest", "qqbar2mu+mu-");
-   TSQLServer *con = TSQLServer::Connect("mysql://localhost:3306", "root", "");
+  TSQLServer *con = TSQLServer::Connect("mysql://e906-db3.fnal.gov:3306", "seaguest", "qqbar2mu+mu-");
+  // TSQLServer *con = TSQLServer::Connect("mysql://localhost:3306", "root", "");
 
    // Select which database to use on the server
    con->Exec(seedstmt);
