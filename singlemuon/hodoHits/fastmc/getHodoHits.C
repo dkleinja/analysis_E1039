@@ -12,6 +12,7 @@
 #include <TString.h>
 #include <TFile.h>
 #include <TTree.h>
+#include <TChain.h>
 #include <TRandom.h>
 #include <TMatrixD.h>
 #include <TLorentzVector.h>
@@ -40,11 +41,26 @@ int main(int argc, char *argv[])
     target = 0;
   
   //get the file
-  sprintf(Fname, "./beamProfile/output.root");
-  sprintf(Fname, "./e906beamProf_100M_0.root");
+  /*
+  sprintf(Fname, "./pythiabkg/E906beamProf_ignoreWARN_100M_0.root");
   //sprintf(Fname, "./nDST/longerkaondecay_50M_0.root");
   TFile *inFile = new TFile(Fname);
+  TTree *dataTree = (TTree*) inFile -> Get("save");
+  */
+  
+  //get the chain
+  //tchain method
+  TChain *dataTree = new TChain("save");
+  int chainfirst = 0;
+  int chainlast = 10;
 
+  for(int i = chainfirst; i <= chainlast; i++){
+    sprintf(Fname, "./pythiabkg/E906beamProf_ignoreWARN_100M_%d.root", i);
+    //cout << "Getting File " << Fname << endl;
+    dataTree -> Add(Fname);
+  }
+
+  
   //make the histos
   for(int i = 0; i < nTrigs; ++i){
     for(int k = 0; k < nHodos; ++k){
@@ -55,24 +71,20 @@ int main(int argc, char *argv[])
       hodoHits[i][k] = new TH1I(Hname, Tname, nElements[k], L0_hodoPos[k], LF_hodoPos[k]);
     }
   }    
-  cout<<"blah"<<endl;
+
   TClonesArray* posArr = new TClonesArray("TVector3");
   TClonesArray* momArr = new TClonesArray("TVector3");
+  dataTree -> SetBranchAddress ("n",        &n);
+  dataTree -> SetBranchAddress ("zProd",    &zProd);
+  dataTree -> SetBranchAddress ("pdg",      pdg);
+  dataTree -> SetBranchAddress ("parentID", parentID);
+  dataTree -> SetBranchAddress ("pos",      &posArr);
+  dataTree -> SetBranchAddress ("mom",      &momArr);
   cout<<"blah"<<endl;
-  TTree *tracktree = (TTree*) inFile -> Get("save");
-  cout<<"blah"<<endl;
-  tracktree -> SetBranchAddress ("n",        &n);
-  cout<<"blah"<<endl;
-  tracktree -> SetBranchAddress ("zProd",    &zProd);
-  tracktree -> SetBranchAddress ("pdg",      pdg);
-  tracktree -> SetBranchAddress ("parentID", parentID);
-  tracktree -> SetBranchAddress ("pos",      &posArr);
-  tracktree -> SetBranchAddress ("mom",      &momArr);
-  cout<<"blah"<<endl;
-  int nentries = tracktree -> GetEntries();
+  int nentries = dataTree -> GetEntries();
   cout << "The number of track Entries is " << nentries << endl;
   for(int ievent = 0; ievent < nentries; ievent++){
-    tracktree -> GetEntry(ievent);
+    dataTree -> GetEntry(ievent);
     //target math
 
     if(target == 0 && zProd < 0.) continue;
