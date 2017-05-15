@@ -24,7 +24,7 @@ ALLFILES      = $(DPSIM_ROOT)/GeomSvc.o $(DPSIM_ROOT)/SRawEvent.o $(DPSIM_ROOT)/
 CC= g++ 
 CCFLAGS = -g -fPIC -I include 
 #VPATH = src include 
-SRC = getHodoHits_trackID.C 
+SRC = getHodoHits_sim.C 
 
 .SUFFIXES  : .o .C
 
@@ -32,7 +32,7 @@ SRC = getHodoHits_trackID.C
 	$(CC) $(CCFLAGS) $(CXXFLAGS) -c  $<
 
 
-getHodoHits_trackID : getHodoHits_trackID.o
+getHodoHits_sim : getHodoHits_sim.o
 	
 	$(CC) $(CCFLAGS) $(ROOTCFLAGS) $(DPSIMCFLAGS) $(ROOTGLIBS) \
 	-o $@ $^ $(DPSIM) $(ROOTGLIBS) 
@@ -41,4 +41,4 @@ clean:
 	rm *.o 
 
 
-all: getHodoHits_trackID
+all: getHodoHits_sim
