@@ -65,10 +65,9 @@ int main(int argc, char *argv[])
   for(int i = 0; i < nTrigs; ++i){
     for(int k = 0; k < nHodos; ++k){
       sprintf(Hname, "nHits_%s_hodo%d",  hodoTrigs[i].c_str(), k);
-      if(i>12)sprintf(Hname, "nHits_nim%d_hodo%d", i-11, k);
       sprintf(Tname, "raw%s hits on %s", hodoTrigs[i].c_str(), hodoNames[k].c_str() );
-      if(i>12)sprintf(Tname, "rawNIM%d hits on %s", i-11, hodoNames[k].c_str() );
-      hodoHits[i][k] = new TH1I(Hname, Tname, nElements[k], L0_hodoPos[k], LF_hodoPos[k]);
+      if(k<8)hodoHits[i][k] = new TH1I(Hname, Tname, nElements[k], X0_hodoPos[k], XF_hodoPos[k]);
+      else hodoHits[i][k] = new TH1I(Hname, Tname, nElements[k], Y0_hodoPos[k], YF_hodoPos[k]);
     }
   }    
 
@@ -89,7 +88,9 @@ int main(int argc, char *argv[])
     if(ievent%100000 == 0)cout << "Events: " << ievent << endl;
     if(target == 0 && zProd < 0.) continue;
     else if(target == 1 && zProd > 0.) continue;
-    
+
+    //set hodo hits to zero
+    for(int k = 0; k < nHodos; ++k)nHits[k] = 0;
     for(int j = 0; j < n; j++){
       //get variables
       TVector3* p_pos = (TVector3*)posArr->At(j);
@@ -173,44 +174,35 @@ int main(int argc, char *argv[])
       
       //do acceptance cuts and hit counts
       for(int k = 0; k < nHodos; ++k){
-	if(k < 8){
-	  if(x_hodoPos[k][j] > L0_hodoPos[k] && x_hodoPos[k][j] < LF_hodoPos[k] && y_hodoPos[k][j] > W0_hodoPos[k] && y_hodoPos[k][j] < WF_hodoPos[k]) nHits[k]++;
-	  else{
-	    x_hodoPos[k][j] = -99999.;
-	    y_hodoPos[k][j] = -99999.;
-	  }
-	}
+	if(x_hodoPos[k][j] > X0_hodoPos[k] && x_hodoPos[k][j] < XF_hodoPos[k] && y_hodoPos[k][j] > Y0_hodoPos[k] && y_hodoPos[k][j] < YF_hodoPos[k]) nHits[k]++;
 	else{
-	  if(x_hodoPos[k][j] > W0_hodoPos[k] && x_hodoPos[k][j] < WF_hodoPos[k] && y_hodoPos[k][j] > L0_hodoPos[k] && y_hodoPos[k][j] < LF_hodoPos[k]) nHits[k]++;
-	  else{
-	    x_hodoPos[k][j] = -99999.;
-	    y_hodoPos[k][j] = -99999.;
-	  }
+	  x_hodoPos[k][j] = -99999.;
+	  y_hodoPos[k][j] = -99999.;
 	}
-      }
+      }  
     }
 
     //do trigger hits
-    for(int trig = 0; trig < nTrigs; trig++) Trig[trig] = 0;
-    if(nHits[8]  > 0 || nHits[9]  > 0) Trig[0] = 1;
-    if(nHits[10] > 0 || nHits[11] > 0) Trig[1] = 1;
-    if(nHits[12] > 0 || nHits[12] > 0) Trig[2] = 1;
-    if(nHits[14] > 0 || nHits[14] > 0) Trig[3] = 1;
+    for(int trig = 0; trig < nTrigs; trig++) Trig[trig] = 0;//reset trigger
+    if(nHits[8]  > 0 || nHits[9]  > 0) Trig[0] = 1;//h1
+    if(nHits[10] > 0 || nHits[11] > 0) Trig[1] = 1;//h2
+    if(nHits[12] > 0 || nHits[12] > 0) Trig[2] = 1;//h3
+    if(nHits[14] > 0 || nHits[14] > 0) Trig[3] = 1;//h4
 
-    if(nHits[8]  > 0 && nHits[10] > 0 || nHits[9]  > 0 && nHits[11] > 0) Trig[4] = 1;
-    if(nHits[8]  > 0 && nHits[12] > 0 || nHits[9]  > 0 && nHits[13] > 0) Trig[5] = 1;
-    if(nHits[8]  > 0 && nHits[14] > 0 || nHits[9]  > 0 && nHits[15] > 0) Trig[6] = 1;
-    if(nHits[10] > 0 && nHits[12] > 0 || nHits[11] > 0 && nHits[13] > 0) Trig[7] = 1;
-    if(nHits[10] > 0 && nHits[14] > 0 || nHits[11] > 0 && nHits[15] > 0) Trig[8] = 1;
-    if(nHits[12] > 0 && nHits[14] > 0 || nHits[13] > 0 && nHits[15] > 0) Trig[9] = 1;
+    if(nHits[8]  > 0 && nHits[10] > 0 || nHits[9]  > 0 && nHits[11] > 0) Trig[4] = 1;//h12
+    if(nHits[8]  > 0 && nHits[12] > 0 || nHits[9]  > 0 && nHits[13] > 0) Trig[5] = 1;//h13
+    if(nHits[8]  > 0 && nHits[14] > 0 || nHits[9]  > 0 && nHits[15] > 0) Trig[6] = 1;//h14
+    if(nHits[10] > 0 && nHits[12] > 0 || nHits[11] > 0 && nHits[13] > 0) Trig[7] = 1;//h23
+    if(nHits[10] > 0 && nHits[14] > 0 || nHits[11] > 0 && nHits[15] > 0) Trig[8] = 1;//h24
+    if(nHits[12] > 0 && nHits[14] > 0 || nHits[13] > 0 && nHits[15] > 0) Trig[9] = 1;//h34
 
-    if(nHits[8]  > 0 && nHits[10] > 0 && nHits[12] > 0 || nHits[9]  > 0 && nHits[11] > 0 && nHits[13] > 0) Trig[10] = 1;
-    if(nHits[8]  > 0 && nHits[10] > 0 && nHits[14] > 0 || nHits[9]  > 0 && nHits[11] > 0 && nHits[15] > 0) Trig[11] = 1;
-    if(nHits[10] > 0 && nHits[12] > 0 && nHits[14] > 0 || nHits[11] > 0 && nHits[13] > 0 && nHits[15] > 0) Trig[12] = 1;
+    if(nHits[8]  > 0 && nHits[10] > 0 && nHits[12] > 0 || nHits[9]  > 0 && nHits[11] > 0 && nHits[13] > 0) Trig[10] = 1;//h123
+    if(nHits[8]  > 0 && nHits[10] > 0 && nHits[14] > 0 || nHits[9]  > 0 && nHits[11] > 0 && nHits[15] > 0) Trig[11] = 1;//h124
+    if(nHits[10] > 0 && nHits[12] > 0 && nHits[14] > 0 || nHits[11] > 0 && nHits[13] > 0 && nHits[15] > 0) Trig[12] = 1;//h234
 
-    if(nHits[8]  > 0 && nHits[10] > 0 && nHits[12] > 0 && nHits[14] > 0 || nHits[9]  > 0 && nHits[11] > 0 && nHits[13] > 0 && nHits[15] > 0) Trig[13] = 1;
-    if(nHits[0]  > 0 && nHits[2] > 0 && nHits[4] > 0 && nHits[8] > 0 || nHits[1]  > 0 && nHits[3] > 0 && nHits[5] > 0 && nHits[7] > 0) Trig[14] = 1;
-    Trig[15] = 1;
+    if(nHits[8]  > 0 && nHits[10] > 0 && nHits[12] > 0 && nHits[14] > 0 || nHits[9]  > 0 && nHits[11] > 0 && nHits[13] > 0 && nHits[15] > 0) Trig[13] = 1;//h1234, nim1
+    if(nHits[0]  > 0 && nHits[2] > 0 && nHits[4] > 0 && nHits[8] > 0 || nHits[1]  > 0 && nHits[3] > 0 && nHits[5] > 0 && nHits[7] > 0) Trig[14] = 1;//h1234, nim2
+    Trig[15] = 1;//all hits
 
     //fill the histos
     for(int i = 0; i < nTrigs; ++i)
@@ -233,9 +225,7 @@ int main(int argc, char *argv[])
       hodoHits[i][k] -> Draw();
 
     }
-    sprintf(Hname, "./images/XhodoHits_MATRIX%d.gif", i);
-    if(i>5)sprintf(Hname, "./images/XhodoHits_NIM%d.gif", i-5);
-    if(i>8)sprintf(Hname, "./images/XhodoHits_%s.gif", hodoTrigs[i-9].c_str());
+    sprintf(Hname, "./images/XhodoHits_%s.gif", hodoTrigs[i].c_str());
     c4m[i] -> SaveAs(Hname);
 
     //yhodos
@@ -244,9 +234,7 @@ int main(int argc, char *argv[])
       hodoHits[i][k+8] -> Draw();
 
     }
-    sprintf(Hname, "./images/YhodoHits_MATRIX%d.gif", i);
-    if(i>5)sprintf(Hname, "./images/YhodoHits_NIM%d.gif", i-5);
-    if(i>8)sprintf(Hname, "./images/YhodoHits_%s.gif", hodoTrigs[i-9].c_str());
+    sprintf(Hname, "./images/YhodoHits_%s.gif", hodoTrigs[i].c_str());
     c4m[i] -> SaveAs(Hname);
   }
   
