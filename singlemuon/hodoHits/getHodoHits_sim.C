@@ -30,20 +30,24 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-
+  //
   //gStyle -> SetOptFit(1);
+  //gStyle -> SetStatX(0.3);
+  //gStyle -> SetStatY(0.3);
   const Float_t PI = 3.14159;
   
   char Fname[128];
   char Hname[128];
   char Tname[128];
   
-  const int nTrigs = 13;
+  const int nTrigs = 21;
   const int nHodos = 16;
   int nElements[nHodos] = {23, 23, 16, 16, 16, 16, 16, 16, 20, 20, 19, 19, 16, 16, 16, 16 };
   int hodoIDs[nHodos] = {25, 26, 31, 32, 33, 34, 39, 40, 27, 28, 29, 30, 35, 36, 37, 38 };
   std::string hodoNames[nHodos] = {"H1B", "H1T", "H2B", "H2T", "H3B", "H3T", "H4B", "H4T", "H1L", "H1R", "H2L", "H2R", "H4Y1L", "H4Y1R", "H4Y2L", "H4Y2R"};
-
+  std::string hodoTrigs[13] = {"1H1Y", "1H2Y", "1H3Y", "1H4Y", "2H12Y", "2H13Y", "2H14Y", "2H23Y", "2H24Y", "3H123Y", "3H124Y", "3H234Y"};
+  //std::string hodoTrigs[13] = {"1H1Y", "1H2Y", "1H3Y", "1H4Y", "2H12Y", "2H13Y", "2H14Y", "2H23Y", "2H24Y", "2H34Y", "3H123Y", "3H124Y", "3H234Y"};
+  
   /* 
   int nElements[8] = {20, 20, 19, 19, 16, 16, 16, 16};
   int hodoIDs[8] = {27, 28, 29, 30, 35, 36, 37, 38}; 
@@ -60,8 +64,11 @@ int main(int argc, char *argv[])
     for(int k = 0; k < nHodos; ++k){
       //cout<<i << " " << k << " blah"<<endl;
       sprintf(Hname, "nHits_matrix%d_hodo%d", i, k);
+      if(i>5)sprintf(Hname, "nHits_nim%d_hodo%d", i-5, k);
+      if(i>8)sprintf(Hname, "nHits_%s_hodo%d",  hodoTrigs[i-9].c_str(), k);
       sprintf(Tname, "rawMATRIX%d hits on %s", i, hodoNames[k].c_str() );
-      if(i>5)sprintf(Tname, "rawNIM%d hits on %s", i-6, hodoNames[k].c_str() );
+      if(i>5)sprintf(Tname, "rawNIM%d hits on %s", i-5, hodoNames[k].c_str() );
+      if(i>8)sprintf(Tname, "raw%s hits on %s", hodoTrigs[i-9].c_str(), hodoNames[k].c_str() ); 
       hodoHits[i][k] = new TH1I(Hname, Tname, nElements[k], 1, nElements[k]+1);
     }
 
@@ -98,7 +105,8 @@ int main(int argc, char *argv[])
   //TFile* dataFile = new TFile("TrigBug2_999x100M.root", "READ");
   //TFile* dataFile = new TFile("ftfp_bert_emx_999x100M.root", "READ");
   //TFile* dataFile = new TFile("NIMbits_20K_200x100M.root", "READ");
-  TFile* dataFile = new TFile("NIMbits2_993x100M.root", "READ");
+  //TFile* dataFile = new TFile("NIMbits2_993x100M.root", "READ");
+  TFile* dataFile = new TFile("HYhits_200x100M.root", "READ");
   //TFile* dataFile = new TFile("batch0_dy_hodo0_10M_R005.root", "READ");
   TTree* dataTree = (TTree*)dataFile->Get("save");
 
@@ -118,7 +126,7 @@ int main(int argc, char *argv[])
   int nentries = dataTree -> GetEntries();
   cout << "The number of Entries is: " << nentries << endl;
   for(Int_t i = 0; i < nentries; ++i){
-  //for(Int_t i = 0; i < 50000; ++i){
+  //for(Int_t i = 0; i < 10000; ++i){
     matrix0=0; matrix1=0; matrix2=0; matrix3=0; matrix4=0;matrix5=0;
     nim0=0; nim1=0; nim2=0; nim3=0;
     h1=0; h2=0; h3=0; h4=0;
@@ -137,14 +145,25 @@ int main(int argc, char *argv[])
     if((evt.fTriggerBit>>2 & 1) != 0) matrix3 = 1;
     if((evt.fTriggerBit>>3 & 1) != 0) matrix4 = 1;
     if((evt.fTriggerBit>>4 & 1) != 0) matrix5 = 1;
-    if((evt.fTriggerBit>>5 & 1) != 0) nim0 = 1;
-    if((evt.fTriggerBit>>6 & 1) != 0) nim1 = 1;
-    if((evt.fTriggerBit>>7 & 1) != 0) nim2 = 1;
-    if((evt.fTriggerBit>>8 & 1) != 0) nim3 = 1;
-    if((evt.fTriggerBit>>9 & 1) != 0) nim4 = 1;
-    if((evt.fTriggerBit>>10 & 1) != 0) nim5 = 1;
-    if((evt.fTriggerBit>>11 & 1) != 0) nim6 = 1;
+    if((evt.fTriggerBit>>5 & 1) != 0) nim1 = 1;
+    if((evt.fTriggerBit>>6 & 1) != 0) nim2 = 1;
+    if((evt.fTriggerBit>>7 & 1) != 0) nim3 = 1;
+    if((evt.fTriggerBit>>8 & 1) != 0) h1 = 1;
+    if((evt.fTriggerBit>>9 & 1) != 0) h2 = 1;
+    if((evt.fTriggerBit>>10 & 1) != 0) h3 = 1;
+    if((evt.fTriggerBit>>11 & 1) != 0) h4 = 1;
+    if((evt.fTriggerBit>>12 & 1) != 0) h12 = 1;
+    if((evt.fTriggerBit>>13 & 1) != 0) h13 = 1;
+    if((evt.fTriggerBit>>14 & 1) != 0) h14 = 1;
+    if((evt.fTriggerBit>>15 & 1) != 0) h23 = 1;
+    if((evt.fTriggerBit>>16 & 1) != 0) h24 = 1;
+    //if((evt.fTriggerBit>>17 & 1) != 0) h34 = 1; out for now need to fix
+    if((evt.fTriggerBit>>17 & 1) != 0) h123 = 1;
+    if((evt.fTriggerBit>>18 & 1) != 0) h124 = 1;
+    if((evt.fTriggerBit>>19 & 1) != 0) h234 = 1;
     
+    
+	
     if(i%100000 == 0)cout << i << "  Number of hits this event is " << rawEvent->getNHits() << endl;
     for(Int_t j = 0; j < rawEvent->getNHits(); ++j){
       DPMCHit hit = rawEvent->getHit(j);
@@ -159,13 +178,23 @@ int main(int argc, char *argv[])
 	  if(matrix3==1)hodoHits[3][k] -> Fill(elementID, sigWeight);
 	  if(matrix4==1)hodoHits[4][k] -> Fill(elementID, sigWeight);
 	  if(matrix5==1)hodoHits[5][k] -> Fill(elementID, sigWeight);
-	  if(nim0==1)hodoHits[6][k] -> Fill(elementID, sigWeight);
-	  if(nim1==1)hodoHits[7][k] -> Fill(elementID, sigWeight);
-	  if(nim2==1)hodoHits[8][k] -> Fill(elementID, sigWeight);
-	  if(nim3==1)hodoHits[9][k] -> Fill(elementID, sigWeight);
-	  if(nim4==1)hodoHits[10][k] -> Fill(elementID, sigWeight);
-	  if(nim5==1)hodoHits[11][k] -> Fill(elementID, sigWeight);
-	  if(nim6==1)hodoHits[12][k] -> Fill(elementID, sigWeight);
+	  if(nim1==1)hodoHits[6][k] -> Fill(elementID, sigWeight);
+	  if(nim2==1)hodoHits[7][k] -> Fill(elementID, sigWeight);
+	  if(nim3==1)hodoHits[8][k] -> Fill(elementID, sigWeight);
+	  if(h1==1)hodoHits[9][k] -> Fill(elementID, sigWeight);
+	  if(h2==1)hodoHits[10][k] -> Fill(elementID, sigWeight);
+	  if(h3==1)hodoHits[11][k] -> Fill(elementID, sigWeight);
+	  if(h4==1)hodoHits[12][k] -> Fill(elementID, sigWeight);
+	  if(h12==1)hodoHits[13][k] -> Fill(elementID, sigWeight);
+	  if(h13==1)hodoHits[14][k] -> Fill(elementID, sigWeight);
+	  if(h14==1)hodoHits[15][k] -> Fill(elementID, sigWeight);
+	  if(h23==1)hodoHits[16][k] -> Fill(elementID, sigWeight);
+	  if(h24==1)hodoHits[17][k] -> Fill(elementID, sigWeight);
+	  //if(h34==1)hodoHits[18][k] -> Fill(elementID, sigWeight);
+	  if(h123==1)hodoHits[18][k] -> Fill(elementID, sigWeight);
+	  if(h124==1)hodoHits[19][k] -> Fill(elementID, sigWeight);
+	  if(h234==1)hodoHits[20][k] -> Fill(elementID, sigWeight);
+
 	}
       }
       //fill 2D plots
@@ -248,7 +277,8 @@ int main(int argc, char *argv[])
       
     }
     sprintf(Hname, "./images/XhodoHits_MATRIX%d.gif", i);
-    if(i>5)sprintf(Hname, "./images/XhodoHits_NIM%d.gif", i-6);
+    if(i>5)sprintf(Hname, "./images/XhodoHits_NIM%d.gif", i-5);
+    if(i>8)sprintf(Hname, "./images/XhodoHits_%s.gif", hodoTrigs[i-9].c_str());
     c4m[i] -> SaveAs(Hname);
 
     //yhodos
@@ -258,7 +288,8 @@ int main(int argc, char *argv[])
       
     }
     sprintf(Hname, "./images/YhodoHits_MATRIX%d.gif", i);
-    if(i>5)sprintf(Hname, "./images/YhodoHits_NIM%d.gif", i-6);
+    if(i>5)sprintf(Hname, "./images/YhodoHits_NIM%d.gif", i-5);
+    if(i>8)sprintf(Hname, "./images/YhodoHits_%s.gif", hodoTrigs[i-9].c_str());
     c4m[i] -> SaveAs(Hname);
 
     //2d plots
@@ -271,6 +302,7 @@ int main(int argc, char *argv[])
       }	
     sprintf(Hname, "./images/muon_hodoHits_MATRIX%d.gif", i);
     if(i>5)sprintf(Hname, "./images/muon_hodoHits_NIM%d.gif", i-5);
+    if(i>8)sprintf(Hname, "./images/muon_hodoHits_%s.gif", hodoTrigs[i-9].c_str());
     c4m[i] -> SaveAs(Hname);
 
     for(int j = 0; j < 2; ++j)
@@ -282,6 +314,7 @@ int main(int argc, char *argv[])
       }	
     sprintf(Hname, "./images/electron_hodoHits_MATRIX%d.gif", i);
     if(i>5)sprintf(Hname, "./images/electron_hodoHits_NIM%d.gif", i-5);
+    if(i>8)sprintf(Hname, "./images/electron_hodoHits_%s.gif", hodoTrigs[i-9].c_str());
     c4m[i] -> SaveAs(Hname);
     
   }
