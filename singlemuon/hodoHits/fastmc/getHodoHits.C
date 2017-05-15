@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
   dataTree -> SetBranchAddress ("parentID", parentID);
   dataTree -> SetBranchAddress ("pos",      &posArr);
   dataTree -> SetBranchAddress ("mom",      &momArr);
-  cout<<"blah"<<endl;
+
   int nentries = dataTree -> GetEntries();
   cout << "The number of track Entries is " << nentries << endl;
   for(int ievent = 0; ievent < nentries; ievent++){
