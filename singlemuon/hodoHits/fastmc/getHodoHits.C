@@ -135,42 +135,42 @@ int main(int argc, char *argv[])
       y_hodoPos[9][j] = y_0 + y_target + y_fmag +                        py_0 / pz_0 * (Z_hodoPos[9] - ZF_FMAG);
 
       //lets get up to kmag
-      x_kmag = px_0     / pz_0 * (ZM_KMAG - ZF_FMAG);
+      x_kmag =  px_0     / pz_0 * (ZM_KMAG - ZF_FMAG);
       dx_kmag = dpx_fmag / pz_0 * (ZM_KMAG - ZF_FMAG);
       y_kmag = (py_0) / pz_0 * (ZM_KMAG - ZF_FMAG);
       dpx_kmag = charge*dpx_kmag;
       
       //les get H2
-      x_hodoPos[2][j]= x_0 + x_target + x_fmag + dx_fmag + x_kmag + dx_kmag + (px_0 + dpx_fmag + dpx_kmag) / pz_0 * (Z_hodoPos[2] - ZM_KMAG);
-      x_hodoPos[3][j]= x_0 + x_target + x_fmag + dx_fmag + x_kmag + dx_kmag + (px_0 + dpx_fmag + dpx_kmag) / pz_0 * (Z_hodoPos[3] - ZM_KMAG);
-      y_hodoPos[2][j]= y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[2] - ZM_KMAG);
-      y_hodoPos[3][j]= y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[3] - ZM_KMAG);
+      x_hodoPos[2][j] = x_0 + x_target + x_fmag + dx_fmag + x_kmag + dx_kmag + (px_0 + dpx_fmag + dpx_kmag) / pz_0 * (Z_hodoPos[2] - ZM_KMAG);
+      x_hodoPos[3][j] = x_0 + x_target + x_fmag + dx_fmag + x_kmag + dx_kmag + (px_0 + dpx_fmag + dpx_kmag) / pz_0 * (Z_hodoPos[3] - ZM_KMAG);
+      y_hodoPos[2][j] = y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[2] - ZM_KMAG);
+      y_hodoPos[3][j] = y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[3] - ZM_KMAG);
       
-      x_hodoPos[10][j]=x_0 + x_target + x_fmag +           x_kmag +                                   px_0 / pz_0 * (Z_hodoPos[10] - ZM_KMAG);
-      x_hodoPos[11][j]=x_0 + x_target + x_fmag +           x_kmag +                                   px_0 / pz_0 * (Z_hodoPos[11] - ZM_KMAG);
-      y_hodoPos[10][j]=y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[10] - ZM_KMAG);
-      y_hodoPos[11][j]=y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[11] - ZM_KMAG);
+      x_hodoPos[10][j] = x_0 + x_target + x_fmag +          x_kmag +                                   px_0 / pz_0 * (Z_hodoPos[10] - ZM_KMAG);
+      x_hodoPos[11][j] = x_0 + x_target + x_fmag +          x_kmag +                                   px_0 / pz_0 * (Z_hodoPos[11] - ZM_KMAG);
+      y_hodoPos[10][j] = y_0 + y_target + y_fmag +          y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[10] - ZM_KMAG);
+      y_hodoPos[11][j] = y_0 + y_target + y_fmag +          y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[11] - ZM_KMAG);
 
       //lets get H3
-      x_hodoPos[4][j]= x_0 + x_target + x_fmag + dx_fmag + x_kmag + dx_kmag + (px_0 + dpx_fmag + dpx_kmag) / pz_0 * (Z_hodoPos[4] - ZM_KMAG);
-      x_hodoPos[5][j]= x_0 + x_target + x_fmag + dx_fmag + x_kmag + dx_kmag + (px_0 + dpx_fmag + dpx_kmag) / pz_0 * (Z_hodoPos[5] - ZM_KMAG);
-      y_hodoPos[4][j]= y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[4] - ZM_KMAG);
-      y_hodoPos[5][j]= y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[5] - ZM_KMAG);
+      x_hodoPos[4][j] = x_0 + x_target + x_fmag + dx_fmag + x_kmag + dx_kmag + (px_0 + dpx_fmag + dpx_kmag) / pz_0 * (Z_hodoPos[4] - ZM_KMAG);
+      x_hodoPos[5][j] = x_0 + x_target + x_fmag + dx_fmag + x_kmag + dx_kmag + (px_0 + dpx_fmag + dpx_kmag) / pz_0 * (Z_hodoPos[5] - ZM_KMAG);
+      y_hodoPos[4][j] = y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[4] - ZM_KMAG);
+      y_hodoPos[5][j] = y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[5] - ZM_KMAG);
 
       //lets get H4
-      x_hodoPos[6][j]= x_0 + x_target + x_fmag + dx_fmag + x_kmag + dx_kmag + (px_0 + dpx_fmag + dpx_kmag) / pz_0 * (Z_hodoPos[6] - ZM_KMAG);
-      x_hodoPos[7][j]= x_0 + x_target + x_fmag + dx_fmag + x_kmag + dx_kmag + (px_0 + dpx_fmag + dpx_kmag) / pz_0 * (Z_hodoPos[7] - ZM_KMAG);
-      y_hodoPos[6][j]= y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[6] - ZM_KMAG);
-      y_hodoPos[7][j]= y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[7] - ZM_KMAG);
+      x_hodoPos[6][j] = x_0 + x_target + x_fmag + dx_fmag + x_kmag + dx_kmag + (px_0 + dpx_fmag + dpx_kmag) / pz_0 * (Z_hodoPos[6] - ZM_KMAG);
+      x_hodoPos[7][j] = x_0 + x_target + x_fmag + dx_fmag + x_kmag + dx_kmag + (px_0 + dpx_fmag + dpx_kmag) / pz_0 * (Z_hodoPos[7] - ZM_KMAG);
+      y_hodoPos[6][j] = y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[6] - ZM_KMAG);
+      y_hodoPos[7][j] = y_0 + y_target + y_fmag +           y_kmag +                                   py_0 / pz_0 * (Z_hodoPos[7] - ZM_KMAG);
       
-      x_hodoPos[12][j]= x_0 + x_target + x_fmag +          x_kmag +                                   px_0 / pz_0 * (Z_hodoPos[12] - ZM_KMAG);
-      x_hodoPos[13][j]=x_0 + x_target + x_fmag +          x_kmag +                                    px_0 / pz_0 * (Z_hodoPos[13] - ZM_KMAG);
-      y_hodoPos[12][j]=y_0 + y_target + y_fmag +          y_kmag +                                    py_0 / pz_0 * (Z_hodoPos[12] - ZM_KMAG);
-      y_hodoPos[13][j]=y_0 + y_target + y_fmag +          y_kmag +                                    py_0 / pz_0 * (Z_hodoPos[13] - ZM_KMAG);
-      x_hodoPos[14][j]=x_0 + x_target + x_fmag +          x_kmag +                                    px_0 / pz_0 * (Z_hodoPos[14] - ZM_KMAG);
-      x_hodoPos[15][j]=x_0 + x_target + x_fmag +          x_kmag +                                    px_0 / pz_0 * (Z_hodoPos[15] - ZM_KMAG);
-      y_hodoPos[14][j]=y_0 + y_target + y_fmag +          y_kmag +                                    py_0 / pz_0 * (Z_hodoPos[14] - ZM_KMAG);
-      y_hodoPos[15][j]=y_0 + y_target + y_fmag +          y_kmag +                                    py_0 / pz_0 * (Z_hodoPos[15] - ZM_KMAG);
+      x_hodoPos[12][j] = x_0 + x_target + x_fmag +          x_kmag +                                   px_0 / pz_0 * (Z_hodoPos[12] - ZM_KMAG);
+      x_hodoPos[13][j] = x_0 + x_target + x_fmag +          x_kmag +                                    px_0 / pz_0 * (Z_hodoPos[13] - ZM_KMAG);
+      y_hodoPos[12][j] = y_0 + y_target + y_fmag +          y_kmag +                                    py_0 / pz_0 * (Z_hodoPos[12] - ZM_KMAG);
+      y_hodoPos[13][j] = y_0 + y_target + y_fmag +          y_kmag +                                    py_0 / pz_0 * (Z_hodoPos[13] - ZM_KMAG);
+      x_hodoPos[14][j] = x_0 + x_target + x_fmag +          x_kmag +                                    px_0 / pz_0 * (Z_hodoPos[14] - ZM_KMAG);
+      x_hodoPos[15][j] = x_0 + x_target + x_fmag +          x_kmag +                                    px_0 / pz_0 * (Z_hodoPos[15] - ZM_KMAG);
+      y_hodoPos[14][j] = y_0 + y_target + y_fmag +          y_kmag +                                    py_0 / pz_0 * (Z_hodoPos[14] - ZM_KMAG);
+      y_hodoPos[15][j] = y_0 + y_target + y_fmag +          y_kmag +                                    py_0 / pz_0 * (Z_hodoPos[15] - ZM_KMAG);
       
       //do acceptance cuts and hit counts
       for(int k = 0; k < nHodos; ++k){
@@ -186,8 +186,8 @@ int main(int argc, char *argv[])
     for(int trig = 0; trig < nTrigs; trig++) Trig[trig] = 0;//reset trigger
     if(nHits[8]  > 0 || nHits[9]  > 0) Trig[0] = 1;//h1
     if(nHits[10] > 0 || nHits[11] > 0) Trig[1] = 1;//h2
-    if(nHits[12] > 0 || nHits[12] > 0) Trig[2] = 1;//h3
-    if(nHits[14] > 0 || nHits[14] > 0) Trig[3] = 1;//h4
+    if(nHits[12] > 0 || nHits[13] > 0) Trig[2] = 1;//h3
+    if(nHits[14] > 0 || nHits[15] > 0) Trig[3] = 1;//h4
 
     if(nHits[8]  > 0 && nHits[10] > 0 || nHits[9]  > 0 && nHits[11] > 0) Trig[4] = 1;//h12
     if(nHits[8]  > 0 && nHits[12] > 0 || nHits[9]  > 0 && nHits[13] > 0) Trig[5] = 1;//h13
@@ -208,8 +208,11 @@ int main(int argc, char *argv[])
     for(int i = 0; i < nTrigs; ++i)
       for(int k = 0; k < nHodos; ++k)
 	for(int j = 0; j < n; j++){
-	  if(k < 8)if(Trig[i] == 1) hodoHits[i][k] -> Fill(x_hodoPos[k][j]);
+	  if(x_hodoPos[k][j] < -1000.) continue;
+	  if(Trig[i] == 1){
+	    if(k<8) hodoHits[i][k] -> Fill(x_hodoPos[k][j]);
 	    else hodoHits[i][k] -> Fill(y_hodoPos[k][j]);
+	  }
 	}
   }
 
