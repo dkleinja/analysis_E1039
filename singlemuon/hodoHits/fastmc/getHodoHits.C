@@ -52,14 +52,13 @@ int main(int argc, char *argv[])
   //tchain method
   TChain *dataTree = new TChain("save");
   int chainfirst = 0;
-  int chainlast = 10;
+  int chainlast = 200;
 
   for(int i = chainfirst; i <= chainlast; i++){
     sprintf(Fname, "./pythiabkg/E906beamProf_ignoreWARN_100M_%d.root", i);
     //cout << "Getting File " << Fname << endl;
     dataTree -> Add(Fname);
   }
-
   
   //make the histos
   for(int i = 0; i < nTrigs; ++i){
@@ -79,13 +78,13 @@ int main(int argc, char *argv[])
   dataTree -> SetBranchAddress ("parentID", parentID);
   dataTree -> SetBranchAddress ("pos",      &posArr);
   dataTree -> SetBranchAddress ("mom",      &momArr);
-
+  
   int nentries = dataTree -> GetEntries();
   cout << "The number of track Entries is " << nentries << endl;
   for(int ievent = 0; ievent < nentries; ievent++){
     dataTree -> GetEntry(ievent);
     //target math
-    if(ievent%100000 == 0)cout << "Events: " << ievent << endl;
+    if(ievent%1000000 == 0)cout << "Events: " << ievent << ".  " << float(ievent)/nentries*100. << "% done. " << endl;
     if(target == 0 && zProd < 0.) continue;
     else if(target == 1 && zProd > 0.) continue;
 
@@ -201,7 +200,7 @@ int main(int argc, char *argv[])
     if(nHits[10] > 0 && nHits[12] > 0 && nHits[14] > 0 || nHits[11] > 0 && nHits[13] > 0 && nHits[15] > 0) Trig[12] = 1;//h234
 
     if(nHits[8]  > 0 && nHits[10] > 0 && nHits[12] > 0 && nHits[14] > 0 || nHits[9]  > 0 && nHits[11] > 0 && nHits[13] > 0 && nHits[15] > 0) Trig[13] = 1;//h1234, nim1
-    if(nHits[0]  > 0 && nHits[2] > 0 && nHits[4] > 0 && nHits[8] > 0 || nHits[1]  > 0 && nHits[3] > 0 && nHits[5] > 0 && nHits[7] > 0) Trig[14] = 1;//h1234, nim2
+    if(nHits[0]  > 0 && nHits[2] > 0 && nHits[4] > 0 && nHits[6] > 0 || nHits[1]  > 0 && nHits[3] > 0 && nHits[5] > 0 && nHits[7] > 0) Trig[14] = 1;//h1234, nim2
     Trig[15] = 1;//all hits
 
     //fill the histos
