@@ -8,7 +8,7 @@ char Hname[128];
 char Tname[128];
 const int nTrigs = 16;
 const int nHodos = 16;
-TH1I *hodoHits[nTrigs][nHodos];
+TH1D *hodoHits[nTrigs][nHodos];
 
 //tree variables
 Int_t all, pions, kaons, others;
